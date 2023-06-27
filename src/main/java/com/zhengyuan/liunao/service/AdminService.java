@@ -2,8 +2,16 @@ package com.zhengyuan.liunao.service;
 
 import java.util.List;
 
-import com.zhengyuan.liunao.entity.Admin;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-public interface AdminService {
-	List<Admin> findAdmin(String account, String psw);
+
+@Service
+public class AdminService {
+
+
+	public void findAdmin(String account, String psw) {
+
+	}
+
 }

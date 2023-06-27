@@ -264,14 +264,6 @@
 <!--				<version>2.0.4.RELEASE</version>-->
 
 
-				<configuration>
-					<encoding>UTF-8</encoding>
-					<nonFilteredFileExtensions>
-						<nonFilteredFileExtension>xlsx</nonFilteredFileExtension>
-						<nonFilteredFileExtension>xls</nonFilteredFileExtension>
-					</nonFilteredFileExtensions>
-				</configuration>
-
 			</plugin>
 		</plugins>
 
