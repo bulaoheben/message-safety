@@ -58,5 +58,5 @@ public class LoginResgisterController {
 			return "BMP 文件上传失败";
 		}
 	}
-	
+
 }
