@@ -2,13 +2,14 @@ package com.zhengyuan.liunao.entity;
 
 import io.swagger.annotations.ApiModel;
 
+import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
 
 public class LSBEncrypt {
 	//原始图片路径
-	private static String _originalPicPath = null;
+	private static String _originalPicPath = "D:\\A\\Courseware\\message safety\\A大作业\\可供选用的图片\\\\24位真彩图\\LENA_COLOR.BMP";
 	//隐藏信息路径
 	private static String _hidingInfoPath = null;
 	//原始图片的文件流
@@ -35,6 +36,9 @@ public class LSBEncrypt {
 	public static String[][] grey_byte;
 	// 嵌入信息过后的十进制的图片数组
 	public static int[][] grey_implant;
+
+	// 传入最初图片的BufferedImage
+	public static BufferedImage new_image;
 
 	public static void setRgb_implant(int[][][] rgb_implant) {
 		LSBEncrypt.rgb_implant = rgb_implant;
