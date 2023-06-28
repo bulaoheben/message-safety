@@ -152,7 +152,7 @@ public class LSBEncryptController {
 				return "图片格式不是BMP图";
 			}
 			inputStream.close();
-			String maxchar=String.valueOf(LSBEncrypt.maxCha);
+			String maxchar=String.valueOf((int)(LSBEncrypt.maxCha/8));
 
 			return maxchar;
 		}catch (IOException e){
@@ -177,7 +177,7 @@ public class LSBEncryptController {
 		char[] strChar=str.toCharArray();
 		int[] x=new int[8];//定义临时补变量长度的数组
 		String strx=null;
-		LSBEncrypt.byteStr=new int[strChar.length*8];//重新清0
+		LSBEncrypt.byteStr=new int[strChar.length*8+8];//重新清0
 		for(int i=0;i<strChar.length;i++){
 			strx = Integer.toBinaryString(strChar[i]);
 			if(strx.length()<8){//8位像素值补0
@@ -191,11 +191,11 @@ public class LSBEncryptController {
 				x[z]=getNumericValue((int)strx.charAt(h));
 				h++;
 			}
-			System.out.println("字符是"+ Arrays.toString(x));
+			//System.out.println("字符是"+ Arrays.toString(x));
 			System.arraycopy(x,0,LSBEncrypt.byteStr,i*8,8);
 		}
 		int[] y = new int[8];
-		for (int i=0;i<8;i++){
+		for(int i=0;i<8;i++){
 			y[i]=0;
 		}
 		System.arraycopy(y,0,LSBEncrypt.byteStr,strChar.length*8,8);
