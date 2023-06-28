@@ -23,6 +23,7 @@ public class LSBEncrypt {
 	public int width;
 	public int height;
 	public int[][][] rgb;
+	public int maxCha;
 
 	public LSBEncrypt(String path1) {
 		this._originalPicPath=path1;
@@ -44,5 +45,8 @@ public class LSBEncrypt {
 
 	public void setRgb(int[][][] rgb){
 		this.rgb=rgb;
+	}
+	public void setType(int type){
+		this.type=type;
 	}
 }
