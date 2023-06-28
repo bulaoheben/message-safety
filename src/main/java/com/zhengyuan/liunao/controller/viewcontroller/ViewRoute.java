@@ -15,7 +15,7 @@ public class ViewRoute {
 	@RequestMapping("/loginView")
 	public String loginView(HttpSession httpSession) {
 		
-		return "login";
+		return "mainPage";
 	}
 	
 	
