@@ -18,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Controller
 @RequestMapping("/Sys")
 public class LSBEncryptController {
-	LSBEncrypt encrypt=new LSBEncrypt();
 
 	//发送24位真彩图
 	@ResponseBody
@@ -59,9 +58,9 @@ public class LSBEncryptController {
 			}
 
 			//对符合规定的图片进行处理
-			this.encrypt.set_originalPicPath(url);
-			this.encrypt.setWidth(width);//读出图片的宽和高
-			this.encrypt.setHeight(height);
+			LSBEncrypt.set_originalPicPath(url);
+			LSBEncrypt.setWidth(width);//读出图片的宽和高
+			LSBEncrypt.setHeight(height);
 			int[][][] rgb = new int[width][height][3];//读出图片的数据
 			//将图像每个点的像素(R,G,B)存储在数组中,读出数据
 			for (int w = 0; w < width; w++) {
@@ -73,7 +72,7 @@ public class LSBEncryptController {
 					rgb[w][h][2] = (pixel & 0xff);//G
 				}
 			}
-			this.encrypt.setRgb(rgb);
+			LSBEncrypt.setRgb(rgb);
 			//判断文件类型(另一种方式
 			File file = new File(url);
 			FileInputStream inputStream = new FileInputStream(file);
@@ -88,17 +87,17 @@ public class LSBEncryptController {
 			// Determine image type based on bpp
 			if(bpp == 24) {
 				System.out.println("This is a 24-bit true color bitmap.");
-				this.encrypt.type=1;
-				this.encrypt.maxCha=width*height*3;//真彩图的隐藏信息的大小bit是（长*宽*3）
+				LSBEncrypt.type=1;
+				LSBEncrypt.maxCha=width*height*3;//真彩图的隐藏信息的大小bit是（长*宽*3）
 			} else if(bpp == 8) {
 				System.out.println("This is an 8-bit grayscale bitmap.");
-				this.encrypt.type=2;
-				this.encrypt.maxCha=width*height;//灰度图的隐藏信息是（长*宽）,即像素数
+				LSBEncrypt.type=2;
+				LSBEncrypt.maxCha=width*height;//灰度图的隐藏信息是（长*宽）,即像素数
 			} else {
 				System.out.println("This is not a supported bitmap format.");
 			}
 			inputStream.close();
-			String maxchar=String.valueOf(this.encrypt.maxCha);
+			String maxchar=String.valueOf(LSBEncrypt.maxCha);
 
 			return maxchar;
 		}catch (IOException e){
