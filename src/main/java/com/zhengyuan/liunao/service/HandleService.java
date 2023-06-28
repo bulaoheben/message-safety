@@ -30,6 +30,8 @@ public class HandleService {
 						}
 					}
 				}
+				int newPixel = (rgb_implant[w][h][0] << 16) | (rgb_implant[w][h][1] << 8) | rgb_implant[w][h][2];
+				LSBEncrypt.new_image.setRGB(w, h, newPixel);
 			}
 		}
 		LSBEncrypt.setRgb_implant(rgb_implant);
@@ -56,6 +58,8 @@ public class HandleService {
 						}
 					}
 				}
+				int newPixel = (grey_implant[w][h] << 16) | (grey_implant[w][h] << 8) | grey_implant[w][h];
+				LSBEncrypt.new_image.setRGB(w, h, newPixel);
 			}
 		}
 		LSBEncrypt.grey_implant = grey_implant;
