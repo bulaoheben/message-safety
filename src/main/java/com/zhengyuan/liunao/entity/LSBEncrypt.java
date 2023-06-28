@@ -22,16 +22,18 @@ public class LSBEncrypt {
 	public static int height;
 	public static int[][][] rgb;
 	// rgb转为二进制的图片数组
-	public static int[][][][] rgb_byte;
+	public static String[][][] rgb_byte;
 	// 嵌入信息的二进制数组
 	public static int[] byteStr;
 	public static int maxCha;
+	// 嵌入信息过后的十进制的图片数组
+	public static int[][][] rgb_implant;
 
-	public static int[][][][] getRgb_byte() {
-		return rgb_byte;
+	public static void setRgb_implant(int[][][] rgb_implant) {
+		LSBEncrypt.rgb_implant = rgb_implant;
 	}
 
-	public static void setRgb_byte(int[][][][] rgb_byte) {
+	public static void setRgb_byte(String[][][] rgb_byte) {
 		LSBEncrypt.rgb_byte = rgb_byte;
 	}
 
