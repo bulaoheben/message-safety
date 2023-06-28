@@ -4,6 +4,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
@@ -15,6 +18,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+
+import static java.lang.Character.getNumericValue;
 
 @Controller
 @RequestMapping("/Sys")
@@ -151,4 +156,82 @@ public class LSBEncryptController {
 	}
 
 
+
+	//加密图片
+	@ResponseBody
+	@RequestMapping(value = "/encryptImage")
+	public Map<String,String> encryptImage(String str){
+		//定义返回结果
+		Map<String,String> map = new HashMap<>();
+		if(str.length()*8>LSBEncrypt.maxCha){
+			map.put("state","超出最长长度显示");
+			return map;
+		}
+
+		//字符串转换为二进制数组
+		char[] strChar=str.toCharArray();
+		int[] x=new int[8];//定义临时补变量长度的数组
+		String strx=null;
+		LSBEncrypt.byteStr=new int[strChar.length*8];//重新清0
+		for(int i=0;i<strChar.length;i++){
+			strx = Integer.toBinaryString(strChar[i]);
+			if(strx.length()<8){//8位像素值补0
+				int y=8-strx.length();
+				for (int z=0;z<y;z++){
+					x[z]=0;
+				}
+			}
+			int h=0;
+			for (int z=8-strx.length();z<8;z++){//补充值进去
+				x[z]=getNumericValue((int)strx.charAt(h));
+				h++;
+			}
+			System.out.println("字符是"+ Arrays.toString(x));
+			System.arraycopy(x,0,LSBEncrypt.byteStr,i*8,8);
+		}
+
+
+
+//		StringBuilder sb = new StringBuilder();
+//		for (int num : LSBEncrypt.byteStr) {
+//			sb.append(num);
+//		}
+//		String result = sb.toString();
+//		String tempStr;
+//		for (int i = 0; i < result.length(); i += 8) {
+//			int endIndex = Math.min(i + 8, result.length());
+//			tempStr = result.substring(i, endIndex);
+//			System.out.println("原本是"+Arrays.toString(LSBEncrypt.byteStr));
+//			System.out.println("加密回来是"+BinstrToChar(tempStr));
+//		}
+		return map;
+	}
+
+	//二进制数组转换为字符串
+//		String[] tempStr=result.split(" ");
+//		char[] tempChar=new char[tempStr.length];
+//		for(int i=0;i<tempStr.length;i++) {
+//			tempChar[i]=BinstrToChar(tempStr[i]);
+//		}
+//		System.out.println(String.valueOf(tempChar));
+
+	//将二进制转换成字符
+	public char BinstrToChar(String binStr){
+		int[] temp=BinstrToIntArray(binStr);
+		int sum=0;
+		for(int i=0; i<temp.length;i++){
+			sum +=temp[temp.length-1-i]<<i;
+		}
+		return (char)sum;
+	}
+
+	//将二进制字符串转换成int数组
+	public int[] BinstrToIntArray(String binStr) {
+		char[] temp=binStr.toCharArray();
+		int[] result=new int[temp.length];
+		for(int i=0;i<temp.length;i++) {
+			result[i]=temp[i]-48;
+		}
+		return result;
+	}
 }

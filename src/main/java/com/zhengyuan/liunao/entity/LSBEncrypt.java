@@ -25,7 +25,7 @@ public class LSBEncrypt {
 	public static String[][][] rgb_byte;
 	// 嵌入信息的二进制数组
 	public static int[] byteStr;
-	public static int maxCha;
+	public static int maxCha=90;
 	// 嵌入信息过后的十进制的图片数组
 	public static int[][][] rgb_implant;
 
