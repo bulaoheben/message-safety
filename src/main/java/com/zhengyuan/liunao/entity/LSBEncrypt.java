@@ -2,6 +2,7 @@ package com.zhengyuan.liunao.entity;
 
 import io.swagger.annotations.ApiModel;
 
+import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
@@ -35,6 +36,9 @@ public class LSBEncrypt {
 	public static String[][] grey_byte;
 	// 嵌入信息过后的十进制的图片数组
 	public static int[][] grey_implant;
+
+	// 传入最初图片的BufferedImage
+	public static BufferedImage new_image;
 
 	public static void setRgb_implant(int[][][] rgb_implant) {
 		LSBEncrypt.rgb_implant = rgb_implant;

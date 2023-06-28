@@ -28,6 +28,7 @@ public class LSBEncryptController {
 	@Autowired
 	HandleService handleService;
 
+
 	//发送24位真彩图
 	@ResponseBody
 	@RequestMapping(value = "/dealLogin")
@@ -78,6 +79,7 @@ public class LSBEncryptController {
 
 			// Determine image type based on bpp
 			if(bpp == 24) {
+				LSBEncrypt.new_image = image;
 				System.out.println("This is a 24-bit true color bitmap.");
 				LSBEncrypt.type=1;
 				LSBEncrypt.maxCha=width*height*3;//真彩图的隐藏信息的大小bit是（长*宽*3）
@@ -116,6 +118,7 @@ public class LSBEncryptController {
 				LSBEncrypt.setRgb(rgb);
 				LSBEncrypt.setRgb_byte(rgb_byte);
 			} else if(bpp == 8) {
+				LSBEncrypt.new_image = image;
 				System.out.println("This is an 8-bit grayscale bitmap.");
 				LSBEncrypt.type=2;
 				LSBEncrypt.maxCha=width*height;//灰度图的隐藏信息是（长*宽）,即像素数
@@ -189,7 +192,22 @@ public class LSBEncryptController {
 			System.out.println("字符是"+ Arrays.toString(x));
 			System.arraycopy(x,0,LSBEncrypt.byteStr,i*8,8);
 		}
+		// 调用嵌入方法
+		if(LSBEncrypt.type==1){
+			handleService.implant_color();
+		}else if(LSBEncrypt.type==2){
+			handleService.implant_grey();
+		}else{
+			map.put("state","图片格式类型不符合规定");
+		}
 
+		// 保存嵌入信息后的图像
+		try {
+			ImageIO.write(LSBEncrypt.new_image, "bmp", new File("handleImg/output.bmp"));  // 保存路径和格式
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		map.put("url","handleImg/output.bmp");
 
 
 //		StringBuilder sb = new StringBuilder();
