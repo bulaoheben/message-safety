@@ -32,6 +32,7 @@ public class LSBEncryptController {
 	@ResponseBody
 	@RequestMapping(value = "/dealLogin")
 	public String getInfo(MultipartFile file, HttpSession httpSession) {
+		System.out.println(file);
 		try {
 			// 处理上传的 BMP 文件
 			if(!file.isEmpty()){
@@ -51,6 +52,7 @@ public class LSBEncryptController {
 	@ResponseBody
 	@RequestMapping(value = "/upImageUrl")
 	public String upImageUrl(String url,HttpSession httpSession) {
+
 
 		if (url==null){
 			return "设置失败";

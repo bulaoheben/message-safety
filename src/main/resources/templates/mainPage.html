@@ -21,6 +21,8 @@
 <script type="text/javascript" src="./js/xadmin.js"></script>
 
 <script src="http://libs.baidu.com/jquery/2.0.0/jquery.js"></script>
+
+
 </head>
 <body
 	style="background-image: url('/Sys/images/mybg.jpg'); background-repeat: no-repeat; ">
@@ -43,12 +45,9 @@
 	<div class="layui-card-header" style="font-size: 23px; line-height: 60px;">LSB数字隐藏算法
 		<div class="layui-col-md6" style="float: right">
 			<div class="layui-panel"  style="float: right">
-				<button type="button" class="layui-btn" id="test1">
-					<i class="layui-icon">&#xe67c;</i>上传图片
-				</button>
-				<button type="button" class="layui-btn layui-btn-normal">读取图片</button>
+				<button  type="button" class="layui-btn layui-btn-normal"   id="test1"><i class="layui-icon">&#xe67c;</i>读取图片</button>
 				<button type="button" class="layui-btn layui-btn-normal">嵌入</button>
-				<button type="button" class="layui-btn layui-btn-normal">存储图片</button>
+				<button type="button" class="layui-btn layui-btn-normal"><i class="layui-icon">&#xe601;</i>存储图片</button>
 				<button type="button" class="layui-btn layui-btn-normal">提取</button>
 			</div>
 		</div>
@@ -59,12 +58,19 @@
 	<div class="layui-card-body">
 <!--	分成均匀3部分	-->
 		<div class="layui-row layui-col-space10">
-			<div class="layui-col-md4" >
-				<img
-						th:src="@{/Sys/images/test6.bmp}"/>
+			<div class="layui-col-md5"  >
+				<text style="font-size: 20px;font-weight: 300;padding-bottom: 4px;display: flex;justify-content: center;width: 512px">原图</text>
+				<fieldset class="layui-elem-field" style="border-color: #969696;width: 512px;height: 512px">
+
+				<img id="demo1"
+
+					 height="512"
+				/>
+				</fieldset>
+
 			</div>
 
-			<div class=" layui-col-md4" style="padding-right: 50px;">
+			<div class=" layui-col-md2" style="padding-right: 50px;">
 				<div class="layui-row" style="padding-top: 60px">
 					<fieldset class="layui-elem-field" style="border-color: #969696;">
 						<legend>可嵌入信息的最大长度</legend>
@@ -83,13 +89,17 @@
 					</fieldset>
 				</div>
 			</div>
-			<div class="layui-col-md4">
-				<img
-						th:src="@{/Sys/images/test6.bmp}"
-						alt="嵌入信息后的图"
-				/>
+			<div class="layui-col-md5" >
+				<text style="font-size: 20px;font-weight: 300;padding-bottom: 4px;display: flex;justify-content: center;width: 512px">嵌入信息后的图</text>
+				<fieldset class="layui-elem-field" style="border-color: #969696;width: 512px;height: 512px">
+
+					<img id="demo2"
+
+						 height="512"
+					/>
+				</fieldset>
+
 			</div>
-		</div>
 
 	</div>
 </div>
@@ -100,7 +110,7 @@
 <script src="/Sys/js/layui.js"></script>
 
 
-<script type="text/javascript">
+<script th:inline="javascript">
 
 	layui.use('upload', function(){
 		var upload = layui.upload;
@@ -108,13 +118,25 @@
 		//执行实例
 		var uploadInst = upload.render({
 			elem: '#test1' //绑定元素
-			,url: '/Sys/upload' //上传接口
-			// ,url: "/Sys/registerClientDeal" //上传接口
-			// ,url: "registerClientDeal" //上传接口
-			// ,url:"http://localhost:8666/Sys/upload" //上传接口
-					,auto: true
+			// ,url: '/Sys/dealLogin' //上传接口
+			,url: '/Sys/image' //上传接口
+
+			,auto: true
+			,before: function(obj){
+				//预读本地文件示例
+				obj.preview(function(index, files, result){
+					$('#demo1').attr('src', result); //图片链接（base64）
+				});
+
+			}
+
 			,done: function(res){
 				//上传完毕回调
+				console.log(res)
+				layer.msg(res.msg, function(){
+					//do something
+				});
+
 			}
 			,error: function(){
 				//请求异常回调
@@ -168,6 +190,13 @@
 	.layui-card{
 		height:612px;
 		margin: 20px;
+	}
+	.title{
+		font-size: 20px;
+		font-weight: 300;
+		padding-bottom: 4px;
+		display: flex;
+		justify-content: center;
 	}
 </style>
 </html>
