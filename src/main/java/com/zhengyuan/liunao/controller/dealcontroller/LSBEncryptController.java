@@ -65,40 +65,6 @@ public class LSBEncryptController {
 			}else if(width>512||height>512){
 				return "图片大小超出要求（512*512）";
 			}
-
-			//对符合规定的图片进行处理
-			LSBEncrypt.set_originalPicPath(url);
-			LSBEncrypt.setWidth(width);//读出图片的宽和高
-			LSBEncrypt.setHeight(height);
-			int[][][] rgb = new int[width][height][3];//读出图片的数据
-			String[][][] rgb_byte = new String[width][height][3];
-			//将图像每个点的像素(R,G,B)存储在数组中,读出数据
-			for (int w = 0; w < width; w++) {
-				for (int h = 0; h < height; h++) {
-					int pixel = image.getRGB(w, h);//读取的是一个24位的数据
-					//数据三个字节分别代表R、B、G
-					rgb[w][h][0] = (pixel & 0xff0000) >> 16;//R
-					rgb[w][h][1] = (pixel & 0xff00) >> 8;//B
-					rgb[w][h][2] = (pixel & 0xff);//G
-					String s1 = Integer.toBinaryString(rgb[w][h][0]);
-					String s2 = Integer.toBinaryString(rgb[w][h][1]);
-					String s3 = Integer.toBinaryString(rgb[w][h][2]);
-					for (int a = s1.length(); a < 8; a++) {
-						s1 = "0"+ s1;
-					}
-					rgb_byte[w][h][0] = s1;
-					for (int a = s2.length(); a < 8; a++) {
-						s2 = "0"+ s2;
-					}
-					rgb_byte[w][h][1] = s2;
-					for (int a = s3.length(); a < 8; a++) {
-						s3 = "0"+ s3;
-					}
-					rgb_byte[w][h][2] = s3;
-				}
-			}
-			LSBEncrypt.setRgb(rgb);
-			LSBEncrypt.setRgb_byte(rgb_byte);
 			//判断文件类型(另一种方式
 			File file = new File(url);
 			FileInputStream inputStream = new FileInputStream(file);
@@ -115,12 +81,70 @@ public class LSBEncryptController {
 				System.out.println("This is a 24-bit true color bitmap.");
 				LSBEncrypt.type=1;
 				LSBEncrypt.maxCha=width*height*3;//真彩图的隐藏信息的大小bit是（长*宽*3）
+
+				//对符合规定的图片进行处理
+				LSBEncrypt.set_originalPicPath(url);
+				LSBEncrypt.setWidth(width);//读出图片的宽和高
+				LSBEncrypt.setHeight(height);
+				int[][][] rgb = new int[width][height][3];//读出图片的数据
+				String[][][] rgb_byte = new String[width][height][3];
+				//将图像每个点的像素(R,G,B)存储在数组中,读出数据
+				for (int w = 0; w < width; w++) {
+					for (int h = 0; h < height; h++) {
+						int pixel = image.getRGB(w, h);//读取的是一个24位的数据
+						//数据三个字节分别代表R、B、G
+						rgb[w][h][0] = (pixel & 0xff0000) >> 16;//R
+						rgb[w][h][1] = (pixel & 0xff00) >> 8;//B
+						rgb[w][h][2] = (pixel & 0xff);//G
+						String s1 = Integer.toBinaryString(rgb[w][h][0]);
+						String s2 = Integer.toBinaryString(rgb[w][h][1]);
+						String s3 = Integer.toBinaryString(rgb[w][h][2]);
+						for (int a = s1.length(); a < 8; a++) {
+							s1 = "0"+ s1;
+						}
+						rgb_byte[w][h][0] = s1;
+						for (int a = s2.length(); a < 8; a++) {
+							s2 = "0"+ s2;
+						}
+						rgb_byte[w][h][1] = s2;
+						for (int a = s3.length(); a < 8; a++) {
+							s3 = "0"+ s3;
+						}
+						rgb_byte[w][h][2] = s3;
+					}
+				}
+				LSBEncrypt.setRgb(rgb);
+				LSBEncrypt.setRgb_byte(rgb_byte);
 			} else if(bpp == 8) {
 				System.out.println("This is an 8-bit grayscale bitmap.");
 				LSBEncrypt.type=2;
 				LSBEncrypt.maxCha=width*height;//灰度图的隐藏信息是（长*宽）,即像素数
+
+				//对符合规定的图片进行处理
+				LSBEncrypt.set_originalPicPath(url);
+				LSBEncrypt.setWidth(width);//读出图片的宽和高
+				LSBEncrypt.setHeight(height);
+
+				int[][] grey = new int[width][height];//读出图片的数据
+				String[][] grey_byte = new String[width][height];
+				for (int w = 0; w < width; w++) {
+					for (int h = 0; h < height; h++) {
+						int pixel = image.getRGB(w, h);
+						//灰度值
+						grey[w][h] = (pixel >> 16) & 0xFF;  // 提取红色通道值作为灰度值
+						String s1 = Integer.toBinaryString(grey[w][h]);
+						for (int a = s1.length(); a < 8; a++) {
+							s1 = "0"+ s1;
+						}
+						grey_byte[w][h] = s1;
+					}
+				}
+				LSBEncrypt.grey = grey;
+				LSBEncrypt.grey_byte = grey_byte;
+
 			} else {
 				System.out.println("This is not a supported bitmap format.");
+				return "图片格式不是BMP图";
 			}
 			inputStream.close();
 			String maxchar=String.valueOf(LSBEncrypt.maxCha);

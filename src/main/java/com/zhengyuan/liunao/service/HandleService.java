@@ -8,42 +8,57 @@ import org.springframework.stereotype.Service;
 public class HandleService {
 
 	// 对24位真彩图进行信息嵌入
-	public String implant(){
+	public void implant_color(){
 		int[][][] rgb_implant = new int[LSBEncrypt.width][LSBEncrypt.height][3];
-		for(int i=0;i< LSBEncrypt.byteStr.length;i++){
-			int w = i/LSBEncrypt.width;
-			int h = i%LSBEncrypt.height;
-			// 对RGB三层写入一样的二进制嵌入信息值
-			if(LSBEncrypt.byteStr[i]==Integer.parseInt(LSBEncrypt.rgb_byte[w][h][0].substring(7,8))){
-				rgb_implant[w][h][0] = LSBEncrypt.rgb[w][h][0];
-			}else {
-				if(LSBEncrypt.byteStr[i]==0){
-					rgb_implant[w][h][0] = LSBEncrypt.rgb[w][h][0]-1;
-				}else{
-					rgb_implant[w][h][0] = LSBEncrypt.rgb[w][h][0]+1;
-				}
-			}
-			if(LSBEncrypt.byteStr[i]==Integer.parseInt(LSBEncrypt.rgb_byte[w][h][1].substring(7,8))){
-				rgb_implant[w][h][1] = LSBEncrypt.rgb[w][h][1];
-			}else {
-				if(LSBEncrypt.byteStr[i]==0){
-					rgb_implant[w][h][1] = LSBEncrypt.rgb[w][h][1]-1;
-				}else{
-					rgb_implant[w][h][1] = LSBEncrypt.rgb[w][h][1]+1;
-				}
-			}
-			if(LSBEncrypt.byteStr[i]==Integer.parseInt(LSBEncrypt.rgb_byte[w][h][2].substring(7,8))){
-				rgb_implant[w][h][2] = LSBEncrypt.rgb[w][h][2];
-			}else {
-				if(LSBEncrypt.byteStr[i]==0){
-					rgb_implant[w][h][2] = LSBEncrypt.rgb[w][h][2]-1;
-				}else{
-					rgb_implant[w][h][2] = LSBEncrypt.rgb[w][h][2]+1;
+		int count = 0;
+		for(int w=0;w<LSBEncrypt.width;w++){
+			for(int h=0;h<LSBEncrypt.height;h++){
+				for(int x=0;x<3;x++){
+					count++;
+					if(count>LSBEncrypt.byteStr.length){
+						rgb_implant[w][h][x] = LSBEncrypt.rgb[w][h][x];
+					}else{
+						// 对RGB三层最后一位写入的二进制嵌入信息值
+						if(LSBEncrypt.byteStr[count-1]==Integer.parseInt(LSBEncrypt.rgb_byte[w][h][x].substring(7,8))){
+							rgb_implant[w][h][x] = LSBEncrypt.rgb[w][h][x];
+						}else {
+							if(LSBEncrypt.byteStr[count-1]==0){
+								rgb_implant[w][h][x] = LSBEncrypt.rgb[w][h][x]-1;
+							}else{
+								rgb_implant[w][h][x] = LSBEncrypt.rgb[w][h][x]+1;
+							}
+						}
+					}
 				}
 			}
 		}
 		LSBEncrypt.setRgb_implant(rgb_implant);
-		return "true";
+	}
+
+	// 对灰度图进行信息嵌入
+	public void implant_grey(){
+		int[][] grey_implant = new int[LSBEncrypt.width][LSBEncrypt.height];
+		int count = 0;
+		for(int w=0;w<LSBEncrypt.width;w++){
+			for(int h=0;h<LSBEncrypt.height;h++){
+				count++;
+				if(count>LSBEncrypt.byteStr.length){
+					grey_implant[w][h] = LSBEncrypt.grey[w][h];
+				}else{
+					// 对RGB三层最后一位写入的二进制嵌入信息值
+					if(LSBEncrypt.byteStr[count-1]==Integer.parseInt(LSBEncrypt.grey_byte[w][h].substring(7,8))){
+						grey_implant[w][h] = LSBEncrypt.grey[w][h];
+					}else {
+						if(LSBEncrypt.byteStr[count-1]==0){
+							grey_implant[w][h] = LSBEncrypt.grey[w][h]-1;
+						}else{
+							grey_implant[w][h] = LSBEncrypt.grey[w][h]+1;
+						}
+					}
+				}
+			}
+		}
+		LSBEncrypt.grey_implant = grey_implant;
 	}
 
 	//将rgb数组转为二进制
