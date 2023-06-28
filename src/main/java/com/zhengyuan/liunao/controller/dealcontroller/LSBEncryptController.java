@@ -194,7 +194,11 @@ public class LSBEncryptController {
 			System.out.println("字符是"+ Arrays.toString(x));
 			System.arraycopy(x,0,LSBEncrypt.byteStr,i*8,8);
 		}
-		System.arraycopy("00000000",0,LSBEncrypt.byteStr,strChar.length*8,8);
+		int[] y = new int[8];
+		for (int i=0;i<8;i++){
+			y[i]=0;
+		}
+		System.arraycopy(y,0,LSBEncrypt.byteStr,strChar.length*8,8);
 
 		// 调用嵌入方法
 		if(LSBEncrypt.type==1){
@@ -227,6 +231,34 @@ public class LSBEncryptController {
 //			System.out.println("加密回来是"+BinstrToChar(tempStr));
 //		}
 		return map;
+	}
+
+	//提取嵌入信息
+	@ResponseBody
+	@RequestMapping(value = "/extractInfo")
+	public Map<String,String> extractInfo(){
+		Map<String,String> map = handleService.extract();
+		Map<String,String> map_return = new HashMap<>();
+		if(map.containsKey("false")){
+			return map;
+		}else{
+			String byte_info = map.get("true");
+			StringBuilder result = new StringBuilder(); // 存储转换结果的字符串
+			int count = 1;
+			for(int i=1;i<=byte_info.length();i++){
+				if(i%8==0){
+					if(count==byte_info.length()/8){
+						break;
+					}
+					count++;
+					int decimal = Integer.parseInt(byte_info.substring(i-8,i), 2); // 将二进制转换为十进制
+					char character = (char) decimal; // 将十进制转换为字符
+					result.append(character);
+				}
+			}
+			map_return.put("true",result.toString());
+			return map_return;
+		}
 	}
 
 	//二进制数组转换为字符串
