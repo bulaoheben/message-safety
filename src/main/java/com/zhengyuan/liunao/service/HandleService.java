@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -93,8 +94,12 @@ public class HandleService {
 	public Map<String,String> extract(){
 		Map<String,String> map = new HashMap<>();
 		try {
-			BufferedImage image = ImageIO.read(new File("handleImg/output.bmp"));
+			String url = "handleImg/output.bmp";
+			BufferedImage image = ImageIO.read(new File(url));
 			byte[] header = new byte[54];
+			File file = new File(url);
+			FileInputStream inputStream = new FileInputStream(file);
+			inputStream.read(header);
 			int bpp = ((int) header[28] & 0xff) | (((int) header[29] & 0xff) << 8);
 			if(bpp == 24) {
 				// 24位真彩图
@@ -186,6 +191,7 @@ public class HandleService {
 				map.put("false","图片格式类型不符合要求");
 				return map;
 			}
+			inputStream.close();
 		}catch (IOException e){
 			map.put("false","选取路径文件不存在！");
 			return map;
