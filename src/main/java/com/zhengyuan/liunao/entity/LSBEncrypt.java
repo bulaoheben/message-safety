@@ -29,6 +29,13 @@ public class LSBEncrypt {
 	// 嵌入信息过后的十进制的图片数组
 	public static int[][][] rgb_implant;
 
+	// 灰度图数组
+	public static int[][] grey;
+	// rgb转为二进制的图片数组
+	public static String[][] grey_byte;
+	// 嵌入信息过后的十进制的图片数组
+	public static int[][] grey_implant;
+
 	public static void setRgb_implant(int[][][] rgb_implant) {
 		LSBEncrypt.rgb_implant = rgb_implant;
 	}
