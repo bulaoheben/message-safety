@@ -1,5 +1,6 @@
 package com.zhengyuan.liunao.controller.dealcontroller;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,6 +8,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
@@ -192,6 +194,8 @@ public class LSBEncryptController {
 			System.out.println("字符是"+ Arrays.toString(x));
 			System.arraycopy(x,0,LSBEncrypt.byteStr,i*8,8);
 		}
+		System.arraycopy("00000000",0,LSBEncrypt.byteStr,strChar.length*8,8);
+
 		// 调用嵌入方法
 		if(LSBEncrypt.type==1){
 			handleService.implant_color();
@@ -260,6 +264,65 @@ public class LSBEncryptController {
 //			tempChar[i]=BinstrToChar(tempStr[i]);
 //		}
 //		System.out.println(String.valueOf(tempChar));
+
+
+	//添加随机噪声
+	@ResponseBody
+	@RequestMapping(value = "/randomNoise")
+	public Map<String,String> randomNoise(){
+		//定义返回结果
+		Map<String,String> map = new HashMap<>();
+
+		// 读取 BMP 图像
+		BufferedImage image = null;
+		try {
+			image = ImageIO.read(new File(LSBEncrypt.get_originalPicPath()));
+		} catch (IOException e) {
+			return map;
+		}
+
+		// 添加随机噪声
+		Random random = new Random();
+		for (int y = 0; y < LSBEncrypt.height; y++) {
+			for (int x = 0; x < LSBEncrypt.width; x++) {
+				// 生成随机噪声
+				int noise = random.nextInt(256);
+
+				// 添加噪声到颜色的 RGB 分量上
+				int red = LSBEncrypt.rgb[y][x][0] + noise;
+				int green = LSBEncrypt.rgb[y][x][1] + noise;
+				int blue = LSBEncrypt.rgb[y][x][2] + noise;
+
+				// 限制 RGB 分量的范围在 0~255 之间
+				red = Math.min(Math.max(red, 0), 255);
+				green = Math.min(Math.max(green, 0), 255);
+				blue = Math.min(Math.max(blue, 0), 255);
+
+				// 创建新的颜色对象并设置噪声后的 RGB 值
+				Color noisyColor = new Color(red, green, blue);
+
+				// 将带有噪声的颜色值设置回图像的像素
+				image.setRGB(y,x, noisyColor.getRGB());
+			}
+		}
+
+		// 保存带有随机噪声的 BMP 图像
+		try {
+			String[] tempStr=LSBEncrypt.get_originalPicPath().split("\\\\");
+			String noiseImageurl=tempStr[0];
+			for (int i=1;i<tempStr.length-1;i++){
+				noiseImageurl=noiseImageurl+"\\"+tempStr[i];
+			}
+			String x= tempStr[tempStr.length-1];
+			String[] array = x.split("\\.");
+			noiseImageurl=noiseImageurl+"\\"+array[0]+"_noise.bmp";
+			ImageIO.write(image, "bmp", new File(noiseImageurl));
+			System.out.println("添加随机噪声完成");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return map;
+	}
 
 	//将二进制转换成字符
 	public char BinstrToChar(String binStr){
