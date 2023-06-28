@@ -192,6 +192,8 @@ public class LSBEncryptController {
 			System.out.println("字符是"+ Arrays.toString(x));
 			System.arraycopy(x,0,LSBEncrypt.byteStr,i*8,8);
 		}
+		System.arraycopy("00000000",0,LSBEncrypt.byteStr,strChar.length*8,8);
+
 		// 调用嵌入方法
 		if(LSBEncrypt.type==1){
 			handleService.implant_color();
