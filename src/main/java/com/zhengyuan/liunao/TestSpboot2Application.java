@@ -6,9 +6,7 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
-@EnableSwagger2  
 @ServletComponentScan
-
 public class TestSpboot2Application {
 
 	// 用spring 资源加载类 ResourceLoader

@@ -1,48 +1,114 @@
 package com.zhengyuan.liunao.entity;
 
 import io.swagger.annotations.ApiModel;
+import lombok.Data;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
 
-@ApiModel(value = "LSBEncrypt",description = "LSB加密")
 public class LSBEncrypt {
 	//原始图片路径
-
-	private String _originalPicPath = null;
+	private static String _originalPicPath = null;
 	//隐藏信息路径
-	private String _hidingInfoPath = null;
+	private static String _hidingInfoPath = null;
 	//原始图片的文件流
-	private FileInputStream _picStream = null;
+	private static FileInputStream _picStream = null;
 	//隐藏信息的文件流
-	private FileOutputStream _infoStream = null;
+	private static FileOutputStream _infoStream = null;
 	//图片类型,1为真彩图，2为256度灰度图
-	public int type = 0;
+	public static int type = 0;
 	//原始图片的宽和高
-	public int width;
-	public int height;
-	public int[][][] rgb;
+	public static int width;
+	public static int height;
+	public static int[][][] rgb;
+	// rgb转为二进制的图片数组
+	public static int[][][][] rgb_byte;
+	// 嵌入信息的二进制数组
+	public static int[] byteStr;
 
-	public LSBEncrypt(String path1) {
-		this._originalPicPath=path1;
-	}
-
-	public LSBEncrypt(){
-		super();
-	}
-
-	public void set_originalPicPath(String Inurl){
-		this._originalPicPath=Inurl;
-	}
-	public void setWidth(int weight){
-		this.width=weight;
-	}
-	public void setHeight(int height){
-		this.height=height;
+	public static int[][][][] getRgb_byte() {
+		return rgb_byte;
 	}
 
-	public void setRgb(int[][][] rgb){
-		this.rgb=rgb;
+	public static void setRgb_byte(int[][][][] rgb_byte) {
+		LSBEncrypt.rgb_byte = rgb_byte;
 	}
+
+	public static String get_originalPicPath() {
+		return _originalPicPath;
+	}
+
+	public static void set_originalPicPath(String _originalPicPath) {
+		LSBEncrypt._originalPicPath = _originalPicPath;
+	}
+
+	public static String get_hidingInfoPath() {
+		return _hidingInfoPath;
+	}
+
+	public static void set_hidingInfoPath(String _hidingInfoPath) {
+		LSBEncrypt._hidingInfoPath = _hidingInfoPath;
+	}
+
+	public static FileInputStream get_picStream() {
+		return _picStream;
+	}
+
+	public static void set_picStream(FileInputStream _picStream) {
+		LSBEncrypt._picStream = _picStream;
+	}
+
+	public static FileOutputStream get_infoStream() {
+		return _infoStream;
+	}
+
+	public static void set_infoStream(FileOutputStream _infoStream) {
+		LSBEncrypt._infoStream = _infoStream;
+	}
+
+	public static int getType() {
+		return type;
+	}
+
+	public static void setType(int type) {
+		LSBEncrypt.type = type;
+	}
+
+	public static int getWidth() {
+		return width;
+	}
+
+	public static void setWidth(int width) {
+		LSBEncrypt.width = width;
+	}
+
+	public static int getHeight() {
+		return height;
+	}
+
+	public static void setHeight(int height) {
+		LSBEncrypt.height = height;
+	}
+
+	public static int[][][] getRgb() {
+		return rgb;
+	}
+
+	public static void setRgb(int[][][] rgb) {
+		LSBEncrypt.rgb = rgb;
+	}
+
+	public static int[] getByteStr() {
+		return byteStr;
+	}
+
+	public static void setByteStr(int[] byteStr) {
+		LSBEncrypt.byteStr = byteStr;
+	}
+
+
+
 }
