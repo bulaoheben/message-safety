@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>首页</title>
+<link rel="stylesheet" href="/Sys/css/layui.css">
+<link rel="stylesheet" href="/Sys/css/sign.css">
+
+<link rel="stylesheet"
+	href="/Sys/js/css/modules/layui-icon-extend/iconfont.css">
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+<link rel="stylesheet" href="/Sys/css/font.css">
+<link rel="stylesheet" href="/Sys/css/xadmin.css">
+<script type="text/javascript"
+	src="/Sys/js/jquery-3.3.1.min.js"></script>
+<script src="/Sys/lib/layui/layui.js" charset="utf-8"></script>
+<script type="text/javascript" src="./js/xadmin.js"></script>
+
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.js"></script>
+</head>
+<body
+	style="background-image: url('/Sys/images/mybg.jpg'); background-repeat: no-repeat; ">
+<ul class="layui-nav" lay-filter="">
+
+	<li class="layui-nav-item">
+		<a href="javascript:;">菜单</a>
+		<dl class="layui-nav-child"> <!-- 二级菜单 -->
+			<dd><a href="">LSB信息隐藏</a></dd>
+			<dd><a href="">图像噪声添加</a></dd>
+			<dd><a href="">带密钥的随机间隔LSB</a></dd>
+		</dl>
+	</li>
+
+</ul>
+
+
+
+<div class="layui-card">
+	<div class="layui-card-header" style="font-size: 23px; line-height: 60px;">LSB数字隐藏算法
+		<div class="layui-col-md6" style="float: right">
+			<div class="layui-panel"  style="float: right">
+				<button type="button" class="layui-btn" id="test1">
+					<i class="layui-icon">&#xe67c;</i>上传图片
+				</button>
+				<button type="button" class="layui-btn layui-btn-normal">读取图片</button>
+				<button type="button" class="layui-btn layui-btn-normal">嵌入</button>
+				<button type="button" class="layui-btn layui-btn-normal">存储图片</button>
+				<button type="button" class="layui-btn layui-btn-normal">提取</button>
+			</div>
+		</div>
+	</div>
+<!--	<div class="layui-row layui-col-space15" style="margin: 10px">-->
+<!--	-->
+<!--	</div>-->
+	<div class="layui-card-body">
+<!--	分成均匀3部分	-->
+		<div class="layui-row layui-col-space10">
+			<div class="layui-col-md4" >
+				<img
+						th:src="@{/Sys/images/test6.bmp}"/>
+			</div>
+
+			<div class=" layui-col-md4" style="padding-right: 50px;">
+				<div class="layui-row" style="padding-top: 60px">
+					<fieldset class="layui-elem-field" style="border-color: #969696;">
+						<legend>可嵌入信息的最大长度</legend>
+						<div class="layui-field-box">
+							内容
+						</div>
+					</fieldset>
+				</div>
+				<div class="layui-row" style="  padding-top: 103px;">
+					<fieldset class="layui-elem-field" style="border-color: #969696;">
+						<legend >要嵌入的信息</legend>
+
+						<div class="layui-field-box">
+							<textarea name="" required lay-verify="required" placeholder="请输入" class="layui-textarea"></textarea>
+						</div>
+					</fieldset>
+				</div>
+			</div>
+			<div class="layui-col-md4">
+				<img
+						th:src="@{/Sys/images/test6.bmp}"
+						alt="嵌入信息后的图"
+				/>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+
+
+</body>
+<script src="/Sys/js/layui.js"></script>
+
+
+<script type="text/javascript">
+
+	layui.use('upload', function(){
+		var upload = layui.upload;
+
+		//执行实例
+		var uploadInst = upload.render({
+			elem: '#test1' //绑定元素
+			,url: '/Sys/upload' //上传接口
+			// ,url: "/Sys/registerClientDeal" //上传接口
+			// ,url: "registerClientDeal" //上传接口
+			// ,url:"http://localhost:8666/Sys/upload" //上传接口
+					,auto: true
+			,done: function(res){
+				//上传完毕回调
+			}
+			,error: function(){
+				//请求异常回调
+			}
+		});
+	});
+
+	$(function() {
+		layui.use('form', function() {
+			// $.ajax({
+			// 	url : "dealLogin",
+			// 	data : logindata
+			// 	type : 'POST',
+			// 	success : function(data) {
+			// 		if (data !== "fail") {
+			// 			// layer.msg("登录成功！！！", function() {
+			// 			if(identify ==='0'){
+			// 				location.href="adminIndex"
+			// 			}else if(identify === '1'){
+			// 				location.href="companyIndex"
+			// 			}else if(identify === '2'){
+			// 				location.href="clientIndex"
+			// 			}
+			// 			// });//layer.msg
+			// 		} else {
+			// 			layui.use('layer', function() {
+			// 				var layer = layui.layer;
+			// 				layer.open({
+			// 					type : 4,
+			// 					content : [ "账号或者密码或者身份不匹配",
+			// 						"#loginsub" ],
+			// 					shade : 0,
+			// 					tips : [ 2, '#cc0000' ],
+			// 					closeBtn : 0,
+			// 					time : 2000,
+			//
+			// 				})
+			// 			});
+			// 		}
+			// 	}
+			// });
+		});
+
+
+
+	});
+
+</script>
+
+<style>
+	.layui-card{
+		height:612px;
+		margin: 20px;
+	}
+</style>
+</html>
