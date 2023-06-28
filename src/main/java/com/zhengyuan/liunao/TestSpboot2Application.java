@@ -17,6 +17,11 @@ public class TestSpboot2Application {
 	public static void main(String[] args) {
 
 		SpringApplication.run(TestSpboot2Application.class, args);
+		String str = "1234567";
+		int index = 7;
+		System.out.println(str.substring(index-3,index));
+		System.out.println(str.substring(index-3));
+		System.out.println(str.length());
 	}
 
 	/*
