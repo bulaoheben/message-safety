@@ -9,7 +9,7 @@ import java.io.FileOutputStream;
 
 public class LSBEncrypt {
 	//原始图片路径
-	private static String _originalPicPath = null;
+	private static String _originalPicPath = "D:\\A\\Courseware\\message safety\\A大作业\\可供选用的图片\\\\24位真彩图\\LENA_COLOR.BMP";
 	//隐藏信息路径
 	private static String _hidingInfoPath = null;
 	//原始图片的文件流
