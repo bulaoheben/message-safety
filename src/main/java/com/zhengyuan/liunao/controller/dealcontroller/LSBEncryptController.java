@@ -82,33 +82,28 @@ public class LSBEncryptController {
 			// Parse the header fields
 			int fileSize = ((int) header[2] & 0xff) | (((int) header[3] & 0xff) << 8) | (((int) header[4] & 0xff) << 16) | (((int) header[5] & 0xff) << 24);
 			int dataOffset = ((int) header[10] & 0xff) | (((int) header[11] & 0xff) << 8) | (((int) header[12] & 0xff) << 16) | (((int) header[13] & 0xff) << 24);
-			int width2 = ((int) header[18] & 0xff) | (((int) header[19] & 0xff) << 8) | (((int) header[20] & 0xff) << 16) | (((int) header[21] & 0xff) << 24);
-			int height2 = ((int) header[22] & 0xff) | (((int) header[23] & 0xff) << 8) | (((int) header[24] & 0xff) << 16) | (((int) header[25] & 0xff) << 24);
 			int bpp = ((int) header[28] & 0xff) | (((int) header[29] & 0xff) << 8);
 
 			// Determine image type based on bpp
 			if(bpp == 24) {
 				System.out.println("This is a 24-bit true color bitmap.");
+				LSBEncrypt.type=1;
+				LSBEncrypt.maxCha=width*height*3;//真彩图的隐藏信息的大小bit是（长*宽*3）
 			} else if(bpp == 8) {
 				System.out.println("This is an 8-bit grayscale bitmap.");
+				LSBEncrypt.type=2;
+				LSBEncrypt.maxCha=width*height;//灰度图的隐藏信息是（长*宽）,即像素数
 			} else {
 				System.out.println("This is not a supported bitmap format.");
 			}
 			inputStream.close();
-			if(width==width2){
-				System.out.println("管用");
-				System.out.println(dataOffset);
-			}else {
-				System.out.println("不管用");
-			}
+			String maxchar=String.valueOf(LSBEncrypt.maxCha);
 
-
-
-
-
-			return "设置成功";
+			return maxchar;
 		}catch (IOException e){
 			return "选取路径文件不存在！";
 		}
 	}
+
+
 }

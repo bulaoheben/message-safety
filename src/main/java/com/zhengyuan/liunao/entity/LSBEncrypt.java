@@ -1,10 +1,7 @@
 package com.zhengyuan.liunao.entity;
 
 import io.swagger.annotations.ApiModel;
-import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
@@ -28,6 +25,7 @@ public class LSBEncrypt {
 	public static int[][][][] rgb_byte;
 	// 嵌入信息的二进制数组
 	public static int[] byteStr;
+	public static int maxCha;
 
 	public static int[][][][] getRgb_byte() {
 		return rgb_byte;
@@ -108,7 +106,6 @@ public class LSBEncrypt {
 	public static void setByteStr(int[] byteStr) {
 		LSBEncrypt.byteStr = byteStr;
 	}
-
 
 
 }
