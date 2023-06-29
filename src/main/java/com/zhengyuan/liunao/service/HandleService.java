@@ -3,6 +3,14 @@ package com.zhengyuan.liunao.service;
 import com.zhengyuan.liunao.entity.LSBEncrypt;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 
 @Service
 public class HandleService {
@@ -80,6 +88,116 @@ public class HandleService {
 			}
 		}
 		LSBEncrypt.setRgb_byte(rgb_byte);
+	}
+
+	// 提取嵌入信息
+	public Map<String,String> extract(){
+		Map<String,String> map = new HashMap<>();
+		try {
+			String url = "handleImg/output.bmp";
+			BufferedImage image = ImageIO.read(new File(url));
+			byte[] header = new byte[54];
+			File file = new File(url);
+			FileInputStream inputStream = new FileInputStream(file);
+			inputStream.read(header);
+			int bpp = ((int) header[28] & 0xff) | (((int) header[29] & 0xff) << 8);
+			if(bpp == 24) {
+				// 24位真彩图
+				int width = image.getWidth();
+				int height = image.getHeight();
+				// 提取出的二进制信息,末尾是00000000结束
+				String byte_info = "";
+				int count = 0;
+				for (int w = 0; w < width; w++) {
+					for (int h = 0; h < height; h++) {
+						int pixel = image.getRGB(w, h);//读取的是一个24位的数据
+						//数据三个字节分别代表R、B、G
+						int red = (pixel & 0xff0000) >> 16;//R
+						int blue = (pixel & 0xff00) >> 8;//B
+						int green = (pixel & 0xff);//G
+						String s1 = Integer.toBinaryString(red);
+						String s2 = Integer.toBinaryString(blue);
+						String s3 = Integer.toBinaryString(green);
+						for (int a = s1.length(); a < 8; a++) {
+							s1 = "0"+ s1;
+						}
+						for (int a = s2.length(); a < 8; a++) {
+							s2 = "0"+ s2;
+						}
+						for (int a = s3.length(); a < 8; a++) {
+							s3 = "0"+ s3;
+						}
+						byte_info+=s1.substring(7,8);
+						count++;
+						if(count==8){
+							if(byte_info.substring(byte_info.length()-8).equals("00000000")){
+								map.put("true",byte_info);
+								return map;
+							}else{
+								count=0;
+							}
+						}
+						byte_info+=s2.substring(7,8);
+						count++;
+						if(count==8){
+							if(byte_info.substring(byte_info.length()-8).equals("00000000")){
+								map.put("true",byte_info);
+								return map;
+							}else{
+								count=0;
+							}
+						}
+						byte_info+=s3.substring(7,8);
+						count++;
+						if(count==8){
+							if(byte_info.substring(byte_info.length()-8).equals("00000000")){
+								map.put("true",byte_info);
+								return map;
+							}else{
+								count=0;
+							}
+						}
+					}
+				}
+			}else if(bpp == 8) {
+				// 灰度图
+				int width = image.getWidth();
+				int height = image.getHeight();
+				// 提取出的二进制信息,末尾是00000000结束
+				String byte_info = "";
+				int count = 0;
+				for (int w = 0; w < width; w++) {
+					for (int h = 0; h < height; h++) {
+						int pixel = image.getRGB(w, h);
+						//灰度值
+						int grey = (pixel >> 16) & 0xFF;
+						String s1 = Integer.toBinaryString(grey);
+						for (int a = s1.length(); a < 8; a++) {
+							s1 = "0"+ s1;
+						}
+						byte_info+=s1.substring(7,8);
+						count++;
+						if(count==8){
+							if(byte_info.substring(byte_info.length()-8).equals("00000000")){
+								map.put("true",byte_info);
+								return map;
+							}else{
+								count=0;
+							}
+						}
+					}
+				}
+			}else{
+				map.put("false","图片格式类型不符合要求");
+				return map;
+			}
+			inputStream.close();
+		}catch (IOException e){
+			map.put("false","选取路径文件不存在！");
+			return map;
+		}
+		map.put("false","未提取出结束标识符00000000");
+		return map;
 	}
 
 }
