@@ -40,6 +40,9 @@ public class LSBEncrypt {
 	// 传入最初图片的BufferedImage
 	public static BufferedImage new_image;
 
+	//是否在二进制数据末尾添加八个0
+	public static boolean isappend=true;
+
 	public static void setRgb_implant(int[][][] rgb_implant) {
 		LSBEncrypt.rgb_implant = rgb_implant;
 	}
@@ -119,6 +122,5 @@ public class LSBEncrypt {
 	public static void setByteStr(int[] byteStr) {
 		LSBEncrypt.byteStr = byteStr;
 	}
-
 
 }

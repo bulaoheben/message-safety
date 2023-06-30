@@ -2,9 +2,10 @@ package com.zhengyuan.liunao.controller.dealcontroller;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +23,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import static java.lang.Character.getNumericValue;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 @Controller
 @RequestMapping("/Sys")
@@ -30,32 +35,10 @@ public class LSBEncryptController {
 	@Autowired
 	HandleService handleService;
 
-
-	//发送24位真彩图
-	@ResponseBody
-	@RequestMapping(value = "/dealLogin")
-	public String getInfo(MultipartFile file, HttpSession httpSession) {
-		System.out.println(file);
-		try {
-			// 处理上传的 BMP 文件
-			if(!file.isEmpty()){
-
-			}
-			byte[] imageData = file.getBytes();
-
-			// 上传成功
-			return "BMP 文件上传成功";
-		} catch (IOException e) {
-			// 上传失败
-			return "BMP 文件上传失败";
-		}
-	}
-
 	//	上传待嵌入的图片
 	@ResponseBody
 	@RequestMapping(value = "/upImageUrl")
 	public String upImageUrl(String url,HttpSession httpSession) {
-
 
 		if (url==null){
 			return "设置失败";
@@ -138,7 +121,7 @@ public class LSBEncryptController {
 					for (int h = 0; h < height; h++) {
 						int pixel = image.getRGB(w, h);
 						//灰度值
-						grey[w][h] = (pixel >> 16) & 0xFF;  // 提取红色通道值作为灰度值
+						grey[w][h] = (pixel >> 16) & 0xFF;
 						String s1 = Integer.toBinaryString(grey[w][h]);
 						for (int a = s1.length(); a < 8; a++) {
 							s1 = "0"+ s1;
@@ -174,12 +157,21 @@ public class LSBEncryptController {
 			map.put("state","超出最长长度显示");
 			return map;
 		}
+		//判断末尾是否需要补0
+		if(str.length()*8==LSBEncrypt.maxCha){
+			LSBEncrypt.isappend=false;
+		}
 
 		//字符串转换为二进制数组
 		char[] strChar=str.toCharArray();
 		int[] x=new int[8];//定义临时补变量长度的数组
 		String strx=null;
-		LSBEncrypt.byteStr=new int[strChar.length*8+8];//重新清0
+		if(LSBEncrypt.isappend==true){
+			LSBEncrypt.byteStr=new int[strChar.length*8+8];//重新清0
+		}else {
+			LSBEncrypt.byteStr=new int[strChar.length*8];//重新清0，末尾不补0
+		}
+
 		for(int i=0;i<strChar.length;i++){
 			strx = Integer.toBinaryString(strChar[i]);
 			if(strx.length()<8){//8位像素值补0
@@ -196,11 +188,13 @@ public class LSBEncryptController {
 			//System.out.println("字符是"+ Arrays.toString(x));
 			System.arraycopy(x,0,LSBEncrypt.byteStr,i*8,8);
 		}
-		int[] y = new int[8];
-		for(int i=0;i<8;i++){
-			y[i]=0;
+		if(LSBEncrypt.isappend==true){
+			int[] y = new int[8];
+			for(int i=0;i<8;i++){
+				y[i]=0;
+			}
+			System.arraycopy(y,0,LSBEncrypt.byteStr,strChar.length*8,8);
 		}
-		System.arraycopy(y,0,LSBEncrypt.byteStr,strChar.length*8,8);
 
 		// 调用嵌入方法
 		if(LSBEncrypt.type==1){
@@ -263,90 +257,81 @@ public class LSBEncryptController {
 		}
 	}
 
-	//二进制数组转换为字符串
-//		String[] tempStr=result.split(" ");
-//		char[] tempChar=new char[tempStr.length];
-//		for(int i=0;i<tempStr.length;i++) {
-//			tempChar[i]=BinstrToChar(tempStr[i]);
-//		}
-//		System.out.println(String.valueOf(tempChar));
 
-
+	//保存图片
 	//添加随机噪声
 	@ResponseBody
-	@RequestMapping(value = "/randomNoise")
-	public Map<String,String> randomNoise(){
-		//定义返回结果
+	@RequestMapping(value = "/saveImage")
+	public Map<String,String> saveImage(String url2){
 		Map<String,String> map = new HashMap<>();
 
-		// 读取 BMP 图像
-		BufferedImage image = null;
-		try {
-			image = ImageIO.read(new File(LSBEncrypt.get_originalPicPath()));
-		} catch (IOException e) {
+			// 打开用于读取的URL连接
+			File oldpaths = new File("handleImg/output.bmp");
+			File newpaths = new File(url2);
+			if (!newpaths.exists()) {
+				//Files.copy(oldpaths.toPath(), newpaths.toPath());
+				copyFile("handleImg/output.bmp", url2);
+				System.out.println("文件移动成功（原文件不存在！");
+			} else {
+				newpaths.delete();
+				copyFile("handleImg/output.bmp", url2);
+				System.out.println("文件移动成功!（原文件存在");
+			}
+			System.out.println("文件转移完成");
+			map.put("result","图片已保存成功");
 			return map;
+
+	}
+
+
+	private static boolean copyFile(String srcPath, String destDir) {
+		boolean flag = false;
+
+		File srcFile = new File(srcPath);
+		if (!srcFile.exists()) { // 源文件不存在
+			System.out.println("源文件不存在");
+			return false;
+		}
+		// 获取待复制文件的文件名
+		File file = new File(srcPath);
+		String fileName = file.getName();
+		// String fileName = srcPath.substring(srcPath.lastIndexOf("//")+2,
+		// srcPath.length());
+		// String fileName = srcPath
+		// .substring(srcPath.lastIndexOf(File.separator));
+		String destPath = destDir + fileName;
+		if (destPath.equals(srcPath)) { // 源文件路径和目标文件路径重复
+			System.out.println("源文件路径和目标文件路径重复!");
+			return false;
+		}
+		File destFile = new File(destPath);
+		if (destFile.exists() && destFile.isFile()) { // 该路径下已经有一个同名文件
+			System.out.println("目标目录下已有同名文件!");
+			return false;
 		}
 
-		// 添加随机噪声
-		Random random = new Random();
-		for (int y = 0; y < LSBEncrypt.height; y++) {
-			for (int x = 0; x < LSBEncrypt.width; x++) {
-				// 生成随机噪声
-				int noise = random.nextInt(256);
-
-				// 添加噪声到颜色的 RGB 分量上
-				int red = LSBEncrypt.rgb[y][x][0] + noise;
-				int green = LSBEncrypt.rgb[y][x][1] + noise;
-				int blue = LSBEncrypt.rgb[y][x][2] + noise;
-
-				// 限制 RGB 分量的范围在 0~255 之间
-				red = Math.min(Math.max(red, 0), 255);
-				green = Math.min(Math.max(green, 0), 255);
-				blue = Math.min(Math.max(blue, 0), 255);
-
-				// 创建新的颜色对象并设置噪声后的 RGB 值
-				Color noisyColor = new Color(red, green, blue);
-
-				// 将带有噪声的颜色值设置回图像的像素
-				image.setRGB(y,x, noisyColor.getRGB());
-			}
-		}
-
-		// 保存带有随机噪声的 BMP 图像
+		File destFileDir = new File(destDir);
+		destFileDir.mkdirs();
 		try {
-			String[] tempStr=LSBEncrypt.get_originalPicPath().split("\\\\");
-			String noiseImageurl=tempStr[0];
-			for (int i=1;i<tempStr.length-1;i++){
-				noiseImageurl=noiseImageurl+"\\"+tempStr[i];
+			FileInputStream fis = new FileInputStream(srcPath);
+			FileOutputStream fos = new FileOutputStream(destFile);
+			byte[] buf = new byte[1024];
+			int c;
+			while ((c = fis.read(buf)) != -1) {
+				fos.write(buf, 0, c);
 			}
-			String x= tempStr[tempStr.length-1];
-			String[] array = x.split("\\.");
-			noiseImageurl=noiseImageurl+"\\"+array[0]+"_noise.bmp";
-			ImageIO.write(image, "bmp", new File(noiseImageurl));
-			System.out.println("添加随机噪声完成");
+			fis.close();
+			fos.close();
+
+			flag = true;
 		} catch (IOException e) {
-			e.printStackTrace();
+			//
 		}
-		return map;
-	}
 
-	//将二进制转换成字符
-	public char BinstrToChar(String binStr){
-		int[] temp=BinstrToIntArray(binStr);
-		int sum=0;
-		for(int i=0; i<temp.length;i++){
-			sum +=temp[temp.length-1-i]<<i;
+		if (flag) {
+			System.out.println("复制文件成功!");
 		}
-		return (char)sum;
-	}
 
-	//将二进制字符串转换成int数组
-	public int[] BinstrToIntArray(String binStr) {
-		char[] temp=binStr.toCharArray();
-		int[] result=new int[temp.length];
-		for(int i=0;i<temp.length;i++) {
-			result[i]=temp[i]-48;
-		}
-		return result;
+		return flag;
 	}
 }
