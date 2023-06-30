@@ -387,23 +387,24 @@ public class LSBEncryptController {
 		}
 
 		// 保存带有随机噪声的 BMP 图像
-		String oldl = LSBEncrypt.get_originalPicPath();
-		String[] newl = oldl.split("\\\\");
-		String[] x = newl[newl.length-1].split("\\.");
-		String target = "";
-		for (int i = 0; i < newl.length - 1; i++) {
-			target = target + newl[i] + "\\";
-		}
-		System.out.println("bmp"+x);
-		target = target + x[0] + "_noise.bmp";
+//		String oldl = LSBEncrypt.get_originalPicPath();
+//		String[] newl = oldl.split("\\\\");
+//		String[] x = newl[newl.length-1].split("\\.");
+//		String target = "";
+//		for (int i = 0; i < newl.length - 1; i++) {
+//			target = target + newl[i] + "\\";
+//		}
+//		System.out.println("bmp"+x);
+//		target = target + x[0] + "_noise.bmp";
 
 
 		try {
-			ImageIO.write(image, "bmp", new File(target));
+			//ImageIO.write(image, "bmp", new File(target));
+			ImageIO.write(image, "bmp", new File("src/main/resources/static/image/handleImg/output.bmp"));
 			System.out.println("添加随机噪声完成，已保存为 output.bmp");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return target;
+		return "src/main/resources/static/image/handleImg/output.bmp";
 	}
 }
