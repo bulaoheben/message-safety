@@ -259,7 +259,6 @@ public class LSBEncryptController {
 
 
 	//保存图片
-	//添加随机噪声
 	@ResponseBody
 	@RequestMapping(value = "/saveImage")
 	public Map<String,String> saveImage(String url2){
@@ -333,5 +332,74 @@ public class LSBEncryptController {
 		}
 
 		return flag;
+	}
+
+
+	@ResponseBody
+	@RequestMapping(value = "/addnoise")
+	public String addnoise(String url2) {
+		// 读取 BMP 图像
+		BufferedImage image = null;
+		try {
+			image = ImageIO.read(new File(LSBEncrypt.get_originalPicPath()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// 添加随机噪声
+		Random random = new Random();
+		for (int y = 0; y < LSBEncrypt.height; y++) {
+			for (int x = 0; x < LSBEncrypt.width; x++) {
+				// 获取当前像素的颜色值
+				Color color = new Color(image.getRGB(x, y));
+
+				// 生成随机噪声
+				int noise = random.nextInt(128);
+				int noise2 = random.nextInt(2);
+
+				// 添加噪声到颜色的 RGB 分量上
+				int red, green, blue;
+				if (noise2 ==0) {
+					red = color.getRed() + noise;
+					green = color.getGreen() + noise;
+					blue = color.getBlue() + noise;
+				} else {
+					red = color.getRed() - noise;
+					green = color.getGreen() - noise;
+					blue = color.getBlue() - noise;
+				}
+
+				// 限制 RGB 分量的范围在 0~255 之间
+				red = Math.min(Math.max(red, 0), 255);
+				green = Math.min(Math.max(green, 0), 255);
+				blue = Math.min(Math.max(blue, 0), 255);
+
+				// 创建新的颜色对象并设置噪声后的 RGB 值
+				Color noisyColor = new Color(red, green, blue);
+
+				// 将带有噪声的颜色值设置回图像的像素
+				image.setRGB(x, y, noisyColor.getRGB());
+			}
+		}
+
+		// 保存带有随机噪声的 BMP 图像
+		String oldl = LSBEncrypt.get_originalPicPath();
+		String[] newl = oldl.split("\\\\");
+		String[] x = newl[newl.length-1].split("\\.");
+		String target = "";
+		for (int i = 0; i < newl.length - 1; i++) {
+			target = target + newl[i] + "\\";
+		}
+		System.out.println("bmp"+x);
+		target = target + x[0] + "_noise.bmp";
+
+
+		try {
+			ImageIO.write(image, "bmp", new File(target));
+			System.out.println("添加随机噪声完成，已保存为 output.bmp");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return target;
 	}
 }
