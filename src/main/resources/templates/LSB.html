@@ -42,13 +42,14 @@
 
 
 <div class="layui-card">
+
 	<div class="layui-card-header" style="font-size: 23px; line-height: 55px;height: 55px;">LSB数字隐藏算法
 		<div class="layui-col-md6" style="float: right">
 			<div class="layui-panel"  style="float: right">
 				<button  type="button" class="layui-btn layui-btn-normal"   id="test1"><i class="layui-icon">&#xe67c;</i>读取图片</button>
 				<button type="button" class="layui-btn layui-btn-normal"  onclick="insertStr()">嵌入</button>
-				<button type="button" class="layui-btn layui-btn-normal"><i class="layui-icon">&#xe601;</i>存储图片</button>
-				<button type="button" class="layui-btn layui-btn-normal">提取</button>
+				<button type="button" class="layui-btn layui-btn-normal" onclick="downloadIamge()"><i class="layui-icon">&#xe601;</i>存储图片</button>
+				<button type="button" class="layui-btn layui-btn-normal" onclick="extract()">提取</button>
 			</div>
 		</div>
 	</div>
@@ -82,24 +83,24 @@
 				</div>
 				<div class="layui-row" style="  padding-top: 103px;">
 					<fieldset class="layui-elem-field" style="border-color: #969696;">
-						<legend >要嵌入的信息</legend>
+						<legend id="message" >要嵌入的信息</legend>
+<!--						<legend id="message" >要嵌入的信息/提取出的信息</legend>-->
 
-						<div class="layui-field-box" >
+						<div class="layui-field-box"  show="true">
 							<textarea id="text" name="str" required lay-verify="required" placeholder="请输入" class="layui-textarea"></textarea>
 						</div>
+<!--						<div show="false" class="layui-field-box" style="display: flex;align-items: center;justify-content: center;" id="extractMsg">-->
+
+<!--						</div>-->
 					</fieldset>
 				</div>
 			</div>
 			<div class="layui-col-md5"style="width: 512px;">
 				<text style="font-size: 20px;font-weight: 300;padding-bottom: 4px;display: flex;justify-content: center;width: 512px">嵌入信息后的图</text>
 				<fieldset class="layui-elem-field" style="border-color: #969696;width: 512px;height: 512px">
+				<div  id="imgContain"></div>
+					<img id="handleImg" width="512" height="512" >
 
-					<img id="handleImg"
-						th:src="@{/image/handleImg/output.bmp}"
-						width="512"
-						 height="512"
-					/>
-<!--			th:src="@{/Sys/images/test6.bmp}"		-->
 				</fieldset>
 
 			</div>
@@ -115,9 +116,12 @@
 
 
 <script th:inline="javascript">
-
+	var ReadFlag;
+	/*读取图片*/
 	layui.use('upload', function(){
 		var upload = layui.upload;
+
+
 
 		//执行实例
 		var uploadInst = upload.render({
@@ -130,6 +134,7 @@
 				//预读本地文件示例
 				obj.preview(function(index, files, result){
 					$('#demo1').attr('src', result); //图片链接（base64）
+
 				});
 
 			}
@@ -140,6 +145,12 @@
 				layer.msg(res.msg, function(){
 
 				});
+
+				// 清空之前的处理图片,并隐藏
+				// $("#handleImg").attr("src","");
+				var handleImg =  document.getElementById("handleImg");
+				handleImg.style.display="none"
+
 
 				if(res.code === 0){
 					// 	将路径存到ssesion
@@ -160,6 +171,8 @@
 								// 可嵌入信息的最大长度
 								var maxChar =  document.getElementById("maxChar");
 								maxChar.innerHTML= data
+
+
 
 							}else {
 								// 显示提示
@@ -185,69 +198,141 @@
 		});
 	});
 
+	/*嵌入信息*/
 	function insertStr () {
 
 		var text = document.getElementById("text");
 		var str = text.value;
+		// var str = $("#text").text()
 		console.log("str:"+str);
 
-		if(str !== ""){
-			$.ajax({
-				url : "encryptImage",
-				data : {str:str},
-				type : 'POST',
-				success : function(data) {
-					console.log(data)
-					if(data.state){
-						console.log("data.state!==null"+data.state)
-						console.log(data.url)
-						layer.msg(data.state, function(){});
-					}else if(data.url!=="") {
-						console.log("data.url!==\"\"")
-						layer.msg("处理成功！", function(){});
 
-						var obj = document.getElementById("handleImg");
-						// obj.setAttribute("src", );//把图片修改为目标路径
+		var message = document.getElementById("message");
+		message.innerText = "要嵌入的信息"
+
+
+		// 通过选择器获取img元素
+		var img = document.getElementById("demo1")
+		// 将图片的src属性作为URL地址
+		var url = img.src
+
+		if(url) {
+
+			if (str !== "") {
+				$.ajax({
+					url: "encryptImage",
+					data: {str: str},
+					type: 'POST',
+					success: function (data) {
+						console.log(data)
+						if (data.state) {
+							layer.msg(data.state, function () {
+							});
+						} else if (data.url !== "") {
+							layer.msg("处理成功！", function () {
+							});
+
+							text.value = ""
+
+
+
+
+							var handleImg = document.getElementById("handleImg");
+							handleImg.style.display = "block"
+
+							$("#handleImg").attr("src", "");
+
+							var URL=data.url+"?s="+ (new Date()).getTime();
+							$("#handleImg").attr("src", URL);
+
+							// 	清空文本框
+
+						}
 
 					}
+				});
 
-				}
-			});
-
+			} else {
+				layer.msg("输入为空！", function () {});
+			}
 		}else {
-			layer.msg("输入为空！", function(){});
+			layer.msg("未读取图片！", function () {});
 		}
 
 	}
+
 	/*存储图片*/
-	function saveImg () {
+	function downloadIamge() {
+		//alert(ReadFlag);
+		// if(ReadFlag === undefined){
+		// 	layer.msg("嵌入信息后的图片未存在！", {time: 1000},function(){});//取消抖动
+		// 	// layer.msg("嵌入信息后的图片未存在！",  { shift: -1 },function(){});//取消抖动
+		//
+		// 	return;
+		// }
 
-		var text = document.getElementById("text");
-		var str = text.value;
-		console.log("str:"+str);
 
-		if(str !== ""){
+
+		// 通过选择器获取img元素
+		var img = document.getElementById("handleImg")
+		// 将图片的src属性作为URL地址
+		var url = img.src
+		if(url === ""){
+			layer.msg("嵌入信息后的图片未存在！", {time: 1000},function(){});//取消抖动
+			// layer.msg("嵌入信息后的图片未存在！",  { shift: -1 },function(){});//取消抖动
+
+			return;
+		}
+		layer.msg("正在下载，请稍后", {time: 3000},function(){});//取消抖动
+			var a = document.createElement('a')
+			var event = new MouseEvent('click')
+			a.download = "handleImg.bmp" // '下载图片名称'
+			a.href = url
+			a.dispatchEvent(event)
+
+
+
+
+	}
+
+
+	/*提取信息*/
+	function extract () {
+
+
+		// 通过选择器获取img元素
+		var img = document.getElementById("handleImg")
+		// 将图片的src属性作为URL地址
+		var url = img.src
+		console.log(url);
+
+		var message = document.getElementById("message");
+		message.innerText = "提取出的信息"
+
+		if(url !== ""){
 			$.ajax({
-				url : "encryptImage",
-				data : {str:str},
+				url : "extractInfo",
 				type : 'POST',
 				success : function(data) {
 					console.log(data)
-					if(data.state!==""){
-						layer.msg(data.state, function(){});
-					}else {
-						layer.msg("处理成功！", function(){});
+					if("true" in data) {
+						layer.msg("提取信息成功！", function(){});
+
+						var text = document.getElementById("text");
+						text.value = data.true
+
+					}else{
+						layer.msg("提取信息失败！", function(){});
 					}
 
 				}
 			});
 
 		}else {
-			layer.msg("输入为空！", function(){});
+			layer.msg("嵌入信息后的图片未存在！", function(){});
 		}
 
 	}
-
 
 
 </script>
@@ -263,6 +348,10 @@
 		padding-bottom: 4px;
 		display: flex;
 		justify-content: center;
+	}
+
+	img{
+		object-fit: contain;
 	}
 </style>
 </html>

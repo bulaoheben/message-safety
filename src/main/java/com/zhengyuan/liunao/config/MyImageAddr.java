@@ -21,5 +21,12 @@ public class MyImageAddr extends WebMvcConfigurerAdapter {
 		registry.addResourceHandler("/uploads/**").addResourceLocations("file:" + MyTool.getImg());
 		super.addResourceHandlers(registry);
 
+		//获取文件的真实路径
+		String path = System.getProperty("user.dir")+"\\src\\main\\resources\\static\\image\\";
+
+		//添加映射
+		registry.addResourceHandler("/image/**").addResourceLocations("file:"+path);
+
+
 	}
 }

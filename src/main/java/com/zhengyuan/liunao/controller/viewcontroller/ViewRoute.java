@@ -13,9 +13,11 @@ public class ViewRoute {
 
 	/*登录相关*/
 	@RequestMapping("/LSB")
-	public String loginView(HttpSession httpSession) {
-		
-		return "LSB";
+	public ModelAndView loginView(HttpSession httpSession) {
+		ModelAndView mv = new ModelAndView("LSB");
+
+		mv.addObject("outputImg","");
+		return mv;
 	}
 		/*添加噪声*/
 	@RequestMapping("/addNoise")

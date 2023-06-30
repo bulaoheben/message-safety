@@ -31,9 +31,9 @@
 	<li class="layui-nav-item">
 		<a href="javascript:;">菜单</a>
 		<dl class="layui-nav-child"> <!-- 二级菜单 -->
-			<dd><a href="">LSB信息隐藏</a></dd>
-			<dd><a href="">图像噪声添加</a></dd>
-			<dd><a href="">带密钥的随机间隔LSB</a></dd>
+			<dd><a href="LSB">LSB信息隐藏</a></dd>
+			<dd><a href="addNoise">图像噪声添加</a></dd>
+			<dd><a href="Key_LSB">带密钥的随机间隔LSB</a></dd>
 		</dl>
 	</li>
 
@@ -42,13 +42,14 @@
 
 
 <div class="layui-card">
-	<div class="layui-card-header" style="font-size: 23px; line-height: 60px;">LSB数字隐藏算法
+
+	<div class="layui-card-header" style="font-size: 23px; line-height: 55px;height: 55px;">带密钥的随机间隔LSB嵌入方法
 		<div class="layui-col-md6" style="float: right">
 			<div class="layui-panel"  style="float: right">
 				<button  type="button" class="layui-btn layui-btn-normal"   id="test1"><i class="layui-icon">&#xe67c;</i>读取图片</button>
-				<button type="button" class="layui-btn layui-btn-normal">嵌入</button>
-				<button type="button" class="layui-btn layui-btn-normal"><i class="layui-icon">&#xe601;</i>存储图片</button>
-				<button type="button" class="layui-btn layui-btn-normal">提取</button>
+				<button type="button" class="layui-btn layui-btn-normal"  onclick="insertStr()">嵌入</button>
+				<button type="button" class="layui-btn layui-btn-normal" onclick="downloadIamge()"><i class="layui-icon">&#xe601;</i>存储图片</button>
+<!--				<button type="button" class="layui-btn layui-btn-normal" onclick="extract()">提取</button>-->
 			</div>
 		</div>
 	</div>
@@ -58,45 +59,48 @@
 	<div class="layui-card-body">
 <!--	分成均匀3部分	-->
 		<div class="layui-row layui-col-space10">
-			<div class="layui-col-md5"  >
+			<div class="layui-col-md5" style=" width: 38%;  margin-left: 32px;" >
 				<text style="font-size: 20px;font-weight: 300;padding-bottom: 4px;display: flex;justify-content: center;width: 512px">原图</text>
 				<fieldset class="layui-elem-field" style="border-color: #969696;width: 512px;height: 512px">
 
 				<img id="demo1"
-
+					 width="512"
 					 height="512"
+
 				/>
 				</fieldset>
 
 			</div>
 
-			<div class=" layui-col-md2" style="padding-right: 50px;">
+			<div class=" layui-col-md2" style="margin-right: 17px;    width: 19.666667%;">
 				<div class="layui-row" style="padding-top: 60px">
 					<fieldset class="layui-elem-field" style="border-color: #969696;">
 						<legend>可嵌入信息的最大长度</legend>
-						<div class="layui-field-box">
-							内容
+						<div class="layui-field-box" style="display: flex;align-items: center;justify-content: center;" id="maxChar">
+
 						</div>
 					</fieldset>
 				</div>
 				<div class="layui-row" style="  padding-top: 103px;">
 					<fieldset class="layui-elem-field" style="border-color: #969696;">
-						<legend >要嵌入的信息</legend>
+						<legend id="message" >要嵌入的信息</legend>
+<!--						<legend id="message" >要嵌入的信息/提取出的信息</legend>-->
 
-						<div class="layui-field-box">
-							<textarea name="" required lay-verify="required" placeholder="请输入" class="layui-textarea"></textarea>
+						<div class="layui-field-box"  show="true">
+							<textarea id="text" name="str" required lay-verify="required" placeholder="请输入" class="layui-textarea"></textarea>
 						</div>
+<!--						<div show="false" class="layui-field-box" style="display: flex;align-items: center;justify-content: center;" id="extractMsg">-->
+
+<!--						</div>-->
 					</fieldset>
 				</div>
 			</div>
-			<div class="layui-col-md5" >
+			<div class="layui-col-md5"style="width: 512px;">
 				<text style="font-size: 20px;font-weight: 300;padding-bottom: 4px;display: flex;justify-content: center;width: 512px">嵌入信息后的图</text>
 				<fieldset class="layui-elem-field" style="border-color: #969696;width: 512px;height: 512px">
+				<div  id="imgContain"></div>
+					<img id="handleImg" width="512" height="512" >
 
-					<img id="demo2"
-
-						 height="512"
-					/>
 				</fieldset>
 
 			</div>
@@ -108,14 +112,16 @@
 
 
 </body>
-
 <script src="/Sys/js/layui.js"></script>
 
 
 <script th:inline="javascript">
-
+	var ReadFlag;
+	/*读取图片*/
 	layui.use('upload', function(){
 		var upload = layui.upload;
+
+
 
 		//执行实例
 		var uploadInst = upload.render({
@@ -124,71 +130,216 @@
 			,url: '/Sys/image' //上传接口
 
 			,auto: true
-			// ,before: function(obj){
-			//
-			//
-			// }
+			,before: function(obj){
+				//预读本地文件示例
+				obj.preview(function(index, files, result){
+					$('#demo1').attr('src', result); //图片链接（base64）
+
+				});
+
+			}
 
 			,done: function(res){
 				//上传完毕回调
 				console.log(res)
 				layer.msg(res.msg, function(){
-					//do something
+
 				});
+
+				// 清空之前的处理图片,并隐藏
+				// $("#handleImg").attr("src","");
+				var handleImg =  document.getElementById("handleImg");
+				handleImg.style.display="none"
+
+
+				if(res.code === 0){
+					// 	将路径存到ssesion
+					let src = res.data.src
+					window.sessionStorage.setItem("LSB_imageSrc",JSON.stringify(src))
+
+
+					// 	读取最大信息
+					$.ajax({
+						url : "upImageUrl",
+						data : {url:src},
+						type : 'POST',
+						success : function(data) {
+							console.log(data)
+
+							// 读取成功
+							if(data!=="设置失败" &&data!=="图片宽度不为4的倍数"&&data!=="图片大小超出要求（512*512）"&&data!=="图片格式不是BMP图"&&data!=="选取路径文件不存在！" ){
+								// 可嵌入信息的最大长度
+								var maxChar =  document.getElementById("maxChar");
+								maxChar.innerHTML= data
+
+
+
+							}else {
+								// 显示提示
+								layer.msg(data, function(){
+								});
+
+
+
+							}
+
+						}
+					});
+				}
 
 
 			}
 			,error: function(){
 				//请求异常回调
+				// 显示提示
+				layer.msg("图片格式错误！", function(){
+				});
 			}
 		});
 	});
 
-	$(function() {
-		layui.use('form', function() {
-			// $.ajax({
-			// 	url : "dealLogin",
-			// 	data : logindata
-			// 	type : 'POST',
-			// 	success : function(data) {
-			// 		if (data !== "fail") {
-			// 			// layer.msg("登录成功！！！", function() {
-			// 			if(identify ==='0'){
-			// 				location.href="adminIndex"
-			// 			}else if(identify === '1'){
-			// 				location.href="companyIndex"
-			// 			}else if(identify === '2'){
-			// 				location.href="clientIndex"
-			// 			}
-			// 			// });//layer.msg
-			// 		} else {
-			// 			layui.use('layer', function() {
-			// 				var layer = layui.layer;
-			// 				layer.open({
-			// 					type : 4,
-			// 					content : [ "账号或者密码或者身份不匹配",
-			// 						"#loginsub" ],
-			// 					shade : 0,
-			// 					tips : [ 2, '#cc0000' ],
-			// 					closeBtn : 0,
-			// 					time : 2000,
-			//
-			// 				})
-			// 			});
-			// 		}
-			// 	}
-			// });
-		});
+	/*嵌入信息*/
+	function insertStr () {
+
+		var text = document.getElementById("text");
+		var str = text.value;
+		// var str = $("#text").text()
+		console.log("str:"+str);
+
+
+		var message = document.getElementById("message");
+		message.innerText = "要嵌入的信息"
+
+
+		// 通过选择器获取img元素
+		var img = document.getElementById("demo1")
+		// 将图片的src属性作为URL地址
+		var url = img.src
+
+		if(url) {
+
+			if (str !== "") {
+				$.ajax({
+					url: "encryptImage",
+					data: {str: str},
+					type: 'POST',
+					success: function (data) {
+						console.log(data)
+						if (data.state) {
+							layer.msg(data.state, function () {
+							});
+						} else if (data.url !== "") {
+							layer.msg("处理成功！", function () {
+							});
+
+							text.value = ""
 
 
 
-	});
+
+							var handleImg = document.getElementById("handleImg");
+							handleImg.style.display = "block"
+
+							$("#handleImg").attr("src", "");
+
+							var URL=data.url+"?s="+ (new Date()).getTime();
+							$("#handleImg").attr("src", URL);
+
+							// 	清空文本框
+
+						}
+
+					}
+				});
+
+			} else {
+				layer.msg("输入为空！", function () {});
+			}
+		}else {
+			layer.msg("未读取图片！", function () {});
+		}
+
+	}
+
+	/*存储图片*/
+	function downloadIamge() {
+		//alert(ReadFlag);
+		// if(ReadFlag === undefined){
+		// 	layer.msg("嵌入信息后的图片未存在！", {time: 1000},function(){});//取消抖动
+		// 	// layer.msg("嵌入信息后的图片未存在！",  { shift: -1 },function(){});//取消抖动
+		//
+		// 	return;
+		// }
+
+
+
+		// 通过选择器获取img元素
+		var img = document.getElementById("handleImg")
+		// 将图片的src属性作为URL地址
+		var url = img.src
+		if(url === ""){
+			layer.msg("嵌入信息后的图片未存在！", {time: 1000},function(){});//取消抖动
+			// layer.msg("嵌入信息后的图片未存在！",  { shift: -1 },function(){});//取消抖动
+
+			return;
+		}
+		layer.msg("正在下载，请稍后", {time: 3000},function(){});//取消抖动
+			var a = document.createElement('a')
+			var event = new MouseEvent('click')
+			a.download = "handleImg.bmp" // '下载图片名称'
+			a.href = url
+			a.dispatchEvent(event)
+
+
+
+
+	}
+
+
+	/*提取信息*/
+	function extract () {
+
+
+		// 通过选择器获取img元素
+		var img = document.getElementById("handleImg")
+		// 将图片的src属性作为URL地址
+		var url = img.src
+		console.log(url);
+
+		var message = document.getElementById("message");
+		message.innerText = "提取出的信息"
+
+		if(url !== ""){
+			$.ajax({
+				url : "extractInfo",
+				type : 'POST',
+				success : function(data) {
+					console.log(data)
+					if("true" in data) {
+						layer.msg("提取信息成功！", function(){});
+
+						var text = document.getElementById("text");
+						text.value = data.true
+
+					}else{
+						layer.msg("提取信息失败！", function(){});
+					}
+
+				}
+			});
+
+		}else {
+			layer.msg("嵌入信息后的图片未存在！", function(){});
+		}
+
+	}
+
 
 </script>
 
 <style>
 	.layui-card{
-		height:612px;
+		height:620px;
 		margin: 20px;
 	}
 	.title{
@@ -197,6 +348,10 @@
 		padding-bottom: 4px;
 		display: flex;
 		justify-content: center;
+	}
+
+	img{
+		object-fit: contain;
 	}
 </style>
 </html>

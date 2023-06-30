@@ -18,6 +18,7 @@ import com.zhengyuan.liunao.entity.LSBEncrypt;
 import com.zhengyuan.liunao.service.HandleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -151,7 +152,7 @@ public class LSBEncryptController {
 	//加密图片
 	@ResponseBody
 	@RequestMapping(value = "/encryptImage")
-	public Map<String,String> encryptImage(String str,ModelAndView mav){
+	public Map<String,String> encryptImage(String str, Model model){
 		//定义返回结果
 		Map<String,String> map = new HashMap<>();
 		if(str.length()*8>LSBEncrypt.maxCha){
@@ -206,16 +207,22 @@ public class LSBEncryptController {
 			map.put("state","图片格式类型不符合规定");
 		}
 
+		boolean finish = false;
 		// 保存嵌入信息后的图像
 		try {
 			ImageIO.write(LSBEncrypt.new_image, "bmp", new File("src/main/resources/static/image/handleImg/output.bmp"));  // 保存路径和格式
+			 finish = true;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		map.put("url","/image/handleImg/output.bmp");
 
-//		显示输出图片
-		mav.addObject("num","/image/handleImg/output.bmp");
+		if(finish){ //等文件读写完再传url
+			map.put("url","/image/handleImg/output.bmp");
+//			mav.addObject("handleImgUrl", "/image/handleImg/output.bmp");
+//			mav.setViewName("LSB");
+			model.addAttribute("handleImgUrl","/image/handleImg/output.bmp");
+
+		}
 
 
 //		StringBuilder sb = new StringBuilder();
@@ -278,7 +285,7 @@ public class LSBEncryptController {
 			} else {
 				newpaths.delete();
 				copyFile("handleImg/output.bmp", url2);
-				System.out.println("文件移动成功!（原文件存在");
+				System.out.println("文件移动成功!（原文件存在)");
 			}
 			System.out.println("文件转移完成");
 			map.put("result","图片已保存成功");
@@ -405,6 +412,6 @@ public class LSBEncryptController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return "src/main/resources/static/image/handleImg/output.bmp";
+		return "/image/handleImg/output.bmp";
 	}
 }
