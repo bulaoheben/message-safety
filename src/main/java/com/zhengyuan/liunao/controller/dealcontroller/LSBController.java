@@ -16,9 +16,6 @@ public class LSBController {
     @ResponseBody
     public String registerCompanyDeal(@RequestBody String msg) {
         System.out.println("上传图片："+msg);
-
-
-
         return msg;
     }
 }
