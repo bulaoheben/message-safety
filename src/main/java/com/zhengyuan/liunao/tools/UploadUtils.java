@@ -48,7 +48,7 @@ public class UploadUtils {
         } else {
             InputStream ins = null;
             ins = file.getInputStream();
-            toFile = new File(file.getOriginalFilename());
+            toFile = new File("src/main/resources/static/image/originImg/"+file.getOriginalFilename());
             inputStreamToFile(ins, toFile);
             ins.close();
         }

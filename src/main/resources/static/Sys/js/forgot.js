@@ -78,7 +78,7 @@ layui.define(['layer', 'form', 'tips'], function(exports) {
         $.post('/json/forgot.json', data.field, function (json) {
             if (json.errcode == 0) {
                 tips.success(json.errmsg, function () {
-                    location.href = '/html/mainPage.html';
+                    location.href = '/html/LSB.html';
                 });
             } else {
                 tips.error(json.errmsg);

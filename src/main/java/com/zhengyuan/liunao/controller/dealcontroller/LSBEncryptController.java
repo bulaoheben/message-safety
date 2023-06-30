@@ -21,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import static java.lang.Character.getNumericValue;
 import java.io.File;
@@ -150,7 +151,7 @@ public class LSBEncryptController {
 	//加密图片
 	@ResponseBody
 	@RequestMapping(value = "/encryptImage")
-	public Map<String,String> encryptImage(String str){
+	public Map<String,String> encryptImage(String str,ModelAndView mav){
 		//定义返回结果
 		Map<String,String> map = new HashMap<>();
 		if(str.length()*8>LSBEncrypt.maxCha){
@@ -207,11 +208,14 @@ public class LSBEncryptController {
 
 		// 保存嵌入信息后的图像
 		try {
-			ImageIO.write(LSBEncrypt.new_image, "bmp", new File("handleImg/output.bmp"));  // 保存路径和格式
+			ImageIO.write(LSBEncrypt.new_image, "bmp", new File("src/main/resources/static/image/handleImg/output.bmp"));  // 保存路径和格式
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		map.put("url","handleImg/output.bmp");
+		map.put("url","/image/handleImg/output.bmp");
+
+//		显示输出图片
+		mav.addObject("num","/image/handleImg/output.bmp");
 
 
 //		StringBuilder sb = new StringBuilder();

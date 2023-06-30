@@ -31,9 +31,9 @@
 	<li class="layui-nav-item">
 		<a href="javascript:;">菜单</a>
 		<dl class="layui-nav-child"> <!-- 二级菜单 -->
-			<dd><a href="">LSB信息隐藏</a></dd>
-			<dd><a href="">图像噪声添加</a></dd>
-			<dd><a href="">带密钥的随机间隔LSB</a></dd>
+			<dd><a href="LSB">LSB信息隐藏</a></dd>
+			<dd><a href="addNoise">图像噪声添加</a></dd>
+			<dd><a href="Key_LSB">带密钥的随机间隔LSB</a></dd>
 		</dl>
 	</li>
 
@@ -42,11 +42,11 @@
 
 
 <div class="layui-card">
-	<div class="layui-card-header" style="font-size: 23px; line-height: 60px;">LSB数字隐藏算法
+	<div class="layui-card-header" style="font-size: 23px; line-height: 55px;height: 55px;">LSB数字隐藏算法
 		<div class="layui-col-md6" style="float: right">
 			<div class="layui-panel"  style="float: right">
 				<button  type="button" class="layui-btn layui-btn-normal"   id="test1"><i class="layui-icon">&#xe67c;</i>读取图片</button>
-				<button type="button" class="layui-btn layui-btn-normal">嵌入</button>
+				<button type="button" class="layui-btn layui-btn-normal"  onclick="insertStr()">嵌入</button>
 				<button type="button" class="layui-btn layui-btn-normal"><i class="layui-icon">&#xe601;</i>存储图片</button>
 				<button type="button" class="layui-btn layui-btn-normal">提取</button>
 			</div>
@@ -58,24 +58,25 @@
 	<div class="layui-card-body">
 <!--	分成均匀3部分	-->
 		<div class="layui-row layui-col-space10">
-			<div class="layui-col-md5"  >
+			<div class="layui-col-md5" style=" width: 38%;  margin-left: 32px;" >
 				<text style="font-size: 20px;font-weight: 300;padding-bottom: 4px;display: flex;justify-content: center;width: 512px">原图</text>
 				<fieldset class="layui-elem-field" style="border-color: #969696;width: 512px;height: 512px">
 
 				<img id="demo1"
-
+					 width="512"
 					 height="512"
+
 				/>
 				</fieldset>
 
 			</div>
 
-			<div class=" layui-col-md2" style="padding-right: 50px;">
+			<div class=" layui-col-md2" style="margin-right: 17px;    width: 19.666667%;">
 				<div class="layui-row" style="padding-top: 60px">
 					<fieldset class="layui-elem-field" style="border-color: #969696;">
 						<legend>可嵌入信息的最大长度</legend>
-						<div class="layui-field-box">
-							内容
+						<div class="layui-field-box" style="display: flex;align-items: center;justify-content: center;" id="maxChar">
+
 						</div>
 					</fieldset>
 				</div>
@@ -83,25 +84,28 @@
 					<fieldset class="layui-elem-field" style="border-color: #969696;">
 						<legend >要嵌入的信息</legend>
 
-						<div class="layui-field-box">
-							<textarea name="" required lay-verify="required" placeholder="请输入" class="layui-textarea"></textarea>
+						<div class="layui-field-box" >
+							<textarea id="text" name="str" required lay-verify="required" placeholder="请输入" class="layui-textarea"></textarea>
 						</div>
 					</fieldset>
 				</div>
 			</div>
-			<div class="layui-col-md5" >
+			<div class="layui-col-md5"style="width: 512px;">
 				<text style="font-size: 20px;font-weight: 300;padding-bottom: 4px;display: flex;justify-content: center;width: 512px">嵌入信息后的图</text>
 				<fieldset class="layui-elem-field" style="border-color: #969696;width: 512px;height: 512px">
 
-					<img id="demo2"
-
+					<img id="handleImg"
+						th:src="@{/image/handleImg/output.bmp}"
+						width="512"
 						 height="512"
 					/>
+<!--			th:src="@{/Sys/images/test6.bmp}"		-->
 				</fieldset>
 
 			</div>
 
 	</div>
+</div>
 </div>
 
 
@@ -134,61 +138,123 @@
 				//上传完毕回调
 				console.log(res)
 				layer.msg(res.msg, function(){
-					//do something
+
 				});
+
+				if(res.code === 0){
+					// 	将路径存到ssesion
+					let src = res.data.src
+					window.sessionStorage.setItem("LSB_imageSrc",JSON.stringify(src))
+
+
+					// 	读取最大信息
+					$.ajax({
+						url : "upImageUrl",
+						data : {url:src},
+						type : 'POST',
+						success : function(data) {
+							console.log(data)
+
+							// 读取成功
+							if(data!=="设置失败" &&data!=="图片宽度不为4的倍数"&&data!=="图片大小超出要求（512*512）"&&data!=="图片格式不是BMP图"&&data!=="选取路径文件不存在！" ){
+								// 可嵌入信息的最大长度
+								var maxChar =  document.getElementById("maxChar");
+								maxChar.innerHTML= data
+
+							}else {
+								// 显示提示
+								layer.msg(data, function(){
+								});
+
+
+
+							}
+
+						}
+					});
+				}
+
 
 			}
 			,error: function(){
 				//请求异常回调
+				// 显示提示
+				layer.msg("图片格式错误！", function(){
+				});
 			}
 		});
 	});
 
-	$(function() {
-		layui.use('form', function() {
-			// $.ajax({
-			// 	url : "dealLogin",
-			// 	data : logindata
-			// 	type : 'POST',
-			// 	success : function(data) {
-			// 		if (data !== "fail") {
-			// 			// layer.msg("登录成功！！！", function() {
-			// 			if(identify ==='0'){
-			// 				location.href="adminIndex"
-			// 			}else if(identify === '1'){
-			// 				location.href="companyIndex"
-			// 			}else if(identify === '2'){
-			// 				location.href="clientIndex"
-			// 			}
-			// 			// });//layer.msg
-			// 		} else {
-			// 			layui.use('layer', function() {
-			// 				var layer = layui.layer;
-			// 				layer.open({
-			// 					type : 4,
-			// 					content : [ "账号或者密码或者身份不匹配",
-			// 						"#loginsub" ],
-			// 					shade : 0,
-			// 					tips : [ 2, '#cc0000' ],
-			// 					closeBtn : 0,
-			// 					time : 2000,
-			//
-			// 				})
-			// 			});
-			// 		}
-			// 	}
-			// });
-		});
+	function insertStr () {
+
+		var text = document.getElementById("text");
+		var str = text.value;
+		console.log("str:"+str);
+
+		if(str !== ""){
+			$.ajax({
+				url : "encryptImage",
+				data : {str:str},
+				type : 'POST',
+				success : function(data) {
+					console.log(data)
+					if(data.state){
+						console.log("data.state!==null"+data.state)
+						console.log(data.url)
+						layer.msg(data.state, function(){});
+					}else if(data.url!=="") {
+						console.log("data.url!==\"\"")
+						layer.msg("处理成功！", function(){});
+
+						var obj = document.getElementById("handleImg");
+						// obj.setAttribute("src", );//把图片修改为目标路径
+
+					}
+
+				}
+			});
+
+		}else {
+			layer.msg("输入为空！", function(){});
+		}
+
+	}
+	/*存储图片*/
+	function saveImg () {
+
+		var text = document.getElementById("text");
+		var str = text.value;
+		console.log("str:"+str);
+
+		if(str !== ""){
+			$.ajax({
+				url : "encryptImage",
+				data : {str:str},
+				type : 'POST',
+				success : function(data) {
+					console.log(data)
+					if(data.state!==""){
+						layer.msg(data.state, function(){});
+					}else {
+						layer.msg("处理成功！", function(){});
+					}
+
+				}
+			});
+
+		}else {
+			layer.msg("输入为空！", function(){});
+		}
+
+	}
 
 
-
-	});
 
 </script>
 
 <style>
 	.layui-card{
-		height:612px;
+		height:620px;
 		margin: 20px;
 	}
 	.title{

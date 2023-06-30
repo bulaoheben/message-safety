@@ -94,7 +94,8 @@ public class HandleService {
 	public Map<String,String> extract(){
 		Map<String,String> map = new HashMap<>();
 		try {
-			String url = "handleImg/output.bmp";
+//			String url = "handleImg/output.bmp";
+			String url = "src/main/resources/static/image/handleImg/output.bmp";
 			BufferedImage image = ImageIO.read(new File(url));
 			byte[] header = new byte[54];
 			File file = new File(url);
