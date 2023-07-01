@@ -98,6 +98,8 @@ public class HandleService {
 	// 提取嵌入信息
 	public Map<String,String> extract(){
 		Map<String,String> map = new HashMap<>();
+		// 提取出的二进制信息,末尾是00000000结束
+		String byte_info = "";
 		try {
 			String url = "src/main/resources/static/image/handleImg/output.bmp";
 			BufferedImage image = ImageIO.read(new File(url));
@@ -111,8 +113,6 @@ public class HandleService {
 				// 24位真彩图
 				int width = image.getWidth();
 				int height = image.getHeight();
-				// 提取出的二进制信息,末尾是00000000结束
-				String byte_info = "";
 				int count = 0;
 				for (int w = 0; w < width; w++) {
 					for (int h = 0; h < height; h++) {
@@ -136,7 +136,7 @@ public class HandleService {
 						byte_info+=s1.substring(7,8);
 						count++;
 						if(count==8){
-							if(byte_info.substring(byte_info.length()-8).equals("00000000")){
+							if(byte_info.substring(byte_info.length()-8).equals("00000000") && LSBEncrypt.isappend){
 								map.put("true",byte_info);
 								return map;
 							}else{
@@ -146,7 +146,7 @@ public class HandleService {
 						byte_info+=s2.substring(7,8);
 						count++;
 						if(count==8){
-							if(byte_info.substring(byte_info.length()-8).equals("00000000")){
+							if(byte_info.substring(byte_info.length()-8).equals("00000000") && LSBEncrypt.isappend){
 								map.put("true",byte_info);
 								return map;
 							}else{
@@ -156,7 +156,7 @@ public class HandleService {
 						byte_info+=s3.substring(7,8);
 						count++;
 						if(count==8){
-							if(byte_info.substring(byte_info.length()-8).equals("00000000")){
+							if(byte_info.substring(byte_info.length()-8).equals("00000000") && LSBEncrypt.isappend){
 								map.put("true",byte_info);
 								return map;
 							}else{
@@ -169,8 +169,6 @@ public class HandleService {
 				// 灰度图
 				int width = image.getWidth();
 				int height = image.getHeight();
-				// 提取出的二进制信息,末尾是00000000结束
-				String byte_info = "";
 				int count = 0;
 				for (int w = 0; w < width; w++) {
 					for (int h = 0; h < height; h++) {
@@ -183,7 +181,7 @@ public class HandleService {
 						byte_info+=s1.substring(7,8);
 						count++;
 						if(count==8){
-							if(byte_info.substring(byte_info.length()-8).equals("00000000")){
+							if(byte_info.substring(byte_info.length()-8).equals("00000000") && LSBEncrypt.isappend){
 								map.put("true",byte_info);
 								return map;
 							}else{
@@ -201,7 +199,11 @@ public class HandleService {
 			map.put("false","选取路径文件不存在！");
 			return map;
 		}
-		map.put("false","未提取出结束标识符00000000");
+		if(LSBEncrypt.isappend){
+			map.put("false","未提取出结束标识符00000000");
+		}else{
+			map.put("true",byte_info);
+		}
 		return map;
 	}
 
