@@ -1,15 +1,19 @@
 package com.zhengyuan.liunao.entity;
 
 import io.swagger.annotations.ApiModel;
+import org.eclipse.swt.graphics.ImageData;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.IndexColorModel;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
 
 public class LSBEncrypt {
+
 	//原始图片路径
-	private static String _originalPicPath = "D:\\A\\Courseware\\message safety\\A大作业\\可供选用的图片\\\\24位真彩图\\LENA_COLOR.BMP";
+	private static String _originalPicPath = null;
 	//隐藏信息路径
 	private static String _hidingInfoPath = null;
 	//原始图片的文件流
@@ -37,8 +41,19 @@ public class LSBEncrypt {
 	// 嵌入信息过后的十进制的图片数组
 	public static int[][] grey_implant;
 
-	// 传入最初图片的BufferedImage
+	// 传入最初图片的BufferedImage--24位真彩图
 	public static BufferedImage new_image;
+	// 传入最初图片的image--256灰度图
+	public static ImageData new_imageData;
+
+
+	public static void set_originalPicPath(String _originalPicPath) {
+		LSBEncrypt._originalPicPath = _originalPicPath;
+	}
+
+	public static String get_originalPicPath() {
+		return _originalPicPath;
+	}
 
 	//是否在二进制数据末尾添加八个0
 	public static boolean isappend=true;
@@ -49,14 +64,6 @@ public class LSBEncrypt {
 
 	public static void setRgb_byte(String[][][] rgb_byte) {
 		LSBEncrypt.rgb_byte = rgb_byte;
-	}
-
-	public static String get_originalPicPath() {
-		return _originalPicPath;
-	}
-
-	public static void set_originalPicPath(String _originalPicPath) {
-		LSBEncrypt._originalPicPath = _originalPicPath;
 	}
 
 	public static String get_hidingInfoPath() {

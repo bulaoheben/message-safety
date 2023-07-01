@@ -1,6 +1,11 @@
 package com.zhengyuan.liunao.controller.dealcontroller;
 
 import java.awt.*;
+import java.awt.image.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
@@ -16,6 +21,12 @@ import javax.servlet.http.HttpSession;
 
 import com.zhengyuan.liunao.entity.LSBEncrypt;
 import com.zhengyuan.liunao.service.HandleService;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageLoader;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -48,6 +59,7 @@ public class LSBEncryptController {
 		//导入图片，检查宽高
 		try{
 			BufferedImage image = ImageIO.read(new File(url));
+			ImageData imageData = new ImageData(url);
 			int width = image.getWidth();
 			int height = image.getHeight();
 			if(width%4!=0){
@@ -107,7 +119,7 @@ public class LSBEncryptController {
 				LSBEncrypt.setRgb(rgb);
 				LSBEncrypt.setRgb_byte(rgb_byte);
 			} else if(bpp == 8) {
-				LSBEncrypt.new_image = image;
+				LSBEncrypt.new_imageData = imageData;
 				System.out.println("This is an 8-bit grayscale bitmap.");
 				LSBEncrypt.type=2;
 				LSBEncrypt.maxCha=width*height;//灰度图的隐藏信息是（长*宽）,即像素数
@@ -121,9 +133,11 @@ public class LSBEncryptController {
 				String[][] grey_byte = new String[width][height];
 				for (int w = 0; w < width; w++) {
 					for (int h = 0; h < height; h++) {
-						int pixel = image.getRGB(w, h);
+						RGB rgb = imageData.palette.getRGB(imageData.getPixel(w, h));
+						int gray = (rgb.red + rgb.green + rgb.blue) / 3; // 灰度公式：(R+G+B)/3
+
 						//灰度值
-						grey[w][h] = (pixel >> 16) & 0xFF;
+						grey[w][h] = gray;
 						String s1 = Integer.toBinaryString(grey[w][h]);
 						for (int a = s1.length(); a < 8; a++) {
 							s1 = "0"+ s1;
@@ -198,27 +212,29 @@ public class LSBEncryptController {
 			System.arraycopy(y,0,LSBEncrypt.byteStr,strChar.length*8,8);
 		}
 
+		String save_url = "src/main/resources/static/image/handleImg/output.bmp";
 		// 调用嵌入方法
 		if(LSBEncrypt.type==1){
 			handleService.implant_color();
+			// 保存嵌入信息后的图像
+			try {
+				ImageIO.write(LSBEncrypt.new_image, "bmp", new File(save_url));  // 保存路径和格式
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			map.put("url",save_url);
 		}else if(LSBEncrypt.type==2){
 			handleService.implant_grey();
+			// 保存嵌入信息后的图像
+			ImageLoader imageLoader = new ImageLoader();
+			imageLoader.data = new ImageData[] { LSBEncrypt.new_imageData };
+			imageLoader.save(save_url, SWT.IMAGE_BMP);
+			map.put("url",save_url);
 		}else{
 			map.put("state","图片格式类型不符合规定");
 		}
 
-		boolean finish = false;
-		// 保存嵌入信息后的图像
-		try {
-			ImageIO.write(LSBEncrypt.new_image, "bmp", new File("src/main/resources/static/image/handleImg/output.bmp"));  // 保存路径和格式
-			 finish = true;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
-		if(finish){ //等文件读写完再传url
-			map.put("url","/image/handleImg/output.bmp");
-		}
 
 
 //		StringBuilder sb = new StringBuilder();
