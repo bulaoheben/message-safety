@@ -32,6 +32,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -41,7 +42,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-@Controller
+@RestController
 @RequestMapping("/Sys")
 public class LSBEncryptController {
 
@@ -266,7 +267,7 @@ public class LSBEncryptController {
 			int count = 1;
 			for(int i=1;i<=byte_info.length();i++){
 				if(i%8==0){
-					if(count==byte_info.length()/8){
+					if(count==byte_info.length()/8 && LSBEncrypt.isappend){
 						break;
 					}
 					count++;
