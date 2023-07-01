@@ -18,11 +18,4 @@ public class TestSpboot2Application {
 
 		SpringApplication.run(TestSpboot2Application.class, args);
 	}
-
-	/*
-	 * @Bean public MultipartResolver multipartResolver() { CommonsMultipartResolver
-	 * multipartResolver = new CommonsMultipartResolver();
-	 * multipartResolver.setMaxUploadSize(1000000); return multipartResolver; }
-	 */
-
 }

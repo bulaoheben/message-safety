@@ -1,10 +1,15 @@
 package com.zhengyuan.liunao.service;
 
 import com.zhengyuan.liunao.entity.LSBEncrypt;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.graphics.RGB;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -40,6 +45,7 @@ public class HandleService {
 				}
 				int newPixel = (rgb_implant[w][h][0] << 16) | (rgb_implant[w][h][1] << 8) | rgb_implant[w][h][2];
 				LSBEncrypt.new_image.setRGB(w, h, newPixel);
+
 			}
 		}
 		LSBEncrypt.setRgb_implant(rgb_implant);
@@ -55,7 +61,7 @@ public class HandleService {
 				if(count>LSBEncrypt.byteStr.length){
 					grey_implant[w][h] = LSBEncrypt.grey[w][h];
 				}else{
-					// 对RGB三层最后一位写入的二进制嵌入信息值
+					// 对最后一位写入的二进制嵌入信息值
 					if(LSBEncrypt.byteStr[count-1]==Integer.parseInt(LSBEncrypt.grey_byte[w][h].substring(7,8))){
 						grey_implant[w][h] = LSBEncrypt.grey[w][h];
 					}else {
@@ -66,8 +72,7 @@ public class HandleService {
 						}
 					}
 				}
-				int newPixel = (grey_implant[w][h] << 16) | (grey_implant[w][h] << 8) | grey_implant[w][h];
-				LSBEncrypt.new_image.setRGB(w, h, newPixel);
+				LSBEncrypt.new_imageData.setPixel(w,h,grey_implant[w][h]);
 			}
 		}
 		LSBEncrypt.grey_implant = grey_implant;
@@ -94,9 +99,9 @@ public class HandleService {
 	public Map<String,String> extract(){
 		Map<String,String> map = new HashMap<>();
 		try {
-//			String url = "handleImg/output.bmp";
 			String url = "src/main/resources/static/image/handleImg/output.bmp";
 			BufferedImage image = ImageIO.read(new File(url));
+			ImageData imageData = new ImageData(url);
 			byte[] header = new byte[54];
 			File file = new File(url);
 			FileInputStream inputStream = new FileInputStream(file);
@@ -169,9 +174,8 @@ public class HandleService {
 				int count = 0;
 				for (int w = 0; w < width; w++) {
 					for (int h = 0; h < height; h++) {
-						int pixel = image.getRGB(w, h);
 						//灰度值
-						int grey = (pixel >> 16) & 0xFF;
+						int grey = imageData.getPixel(w,h);
 						String s1 = Integer.toBinaryString(grey);
 						for (int a = s1.length(); a < 8; a++) {
 							s1 = "0"+ s1;
