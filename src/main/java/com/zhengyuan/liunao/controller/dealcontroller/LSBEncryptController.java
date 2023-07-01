@@ -152,7 +152,7 @@ public class LSBEncryptController {
 	//加密图片
 	@ResponseBody
 	@RequestMapping(value = "/encryptImage")
-	public Map<String,String> encryptImage(String str, Model model){
+	public Map<String,String> encryptImage(String str){
 		//定义返回结果
 		Map<String,String> map = new HashMap<>();
 		if(str.length()*8>LSBEncrypt.maxCha){
@@ -218,10 +218,6 @@ public class LSBEncryptController {
 
 		if(finish){ //等文件读写完再传url
 			map.put("url","/image/handleImg/output.bmp");
-//			mav.addObject("handleImgUrl", "/image/handleImg/output.bmp");
-//			mav.setViewName("LSB");
-			model.addAttribute("handleImgUrl","/image/handleImg/output.bmp");
-
 		}
 
 
