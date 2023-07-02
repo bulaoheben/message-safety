@@ -48,6 +48,7 @@ public class LSBEncryptController {
 
 	@Autowired
 	HandleService handleService;
+	private int noise;
 
 	//	上传待嵌入的图片
 	@ResponseBody
@@ -286,11 +287,11 @@ public class LSBEncryptController {
 	//保存图片
 	@ResponseBody
 	@RequestMapping(value = "/saveImage")
-	public Map<String,String> saveImage(String url2){
-		Map<String,String> map = new HashMap<>();
-
+	public String saveImage(String url2){
+		url2=url2+"\\image.bmp";
 			// 打开用于读取的URL连接
-			File oldpaths = new File("handleImg/output.bmp");
+			File oldpaths = new File("src/main/resources/static/image/handleImg/output.bmp");
+
 			File newpaths = new File(url2);
 			if (!newpaths.exists()) {
 				//Files.copy(oldpaths.toPath(), newpaths.toPath());
@@ -302,9 +303,7 @@ public class LSBEncryptController {
 				System.out.println("文件移动成功!（原文件存在)");
 			}
 			System.out.println("文件转移完成");
-			map.put("result","图片已保存成功");
-			return map;
-
+			return url2;
 	}
 
 
