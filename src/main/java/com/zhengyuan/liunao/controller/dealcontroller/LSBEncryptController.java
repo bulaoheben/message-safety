@@ -417,7 +417,6 @@ public class LSBEncryptController {
 //		System.out.println("bmp"+x);
 //		target = target + x[0] + "_noise.bmp";
 
-
 		try {
 			//ImageIO.write(image, "bmp", new File(target));
 			ImageIO.write(image, "bmp", new File("src/main/resources/static/image/handleImg/output.bmp"));
@@ -427,4 +426,50 @@ public class LSBEncryptController {
 		}
 		return "/image/handleImg/output.bmp";
 	}
+
+
+//	@ResponseBody
+//	@RequestMapping(value = "/randomEmbed")
+//	public String randomEmbed(String message,String key) {
+//		//限制密钥长度
+//		if(key.length()>8){
+//			return "密钥长度超出限制";
+//		}
+//		//限制嵌入信息长度
+//		if(message.length()>20){
+//			return "嵌入信息字符长度超出限制（20以内）";
+//		}
+//
+//		char[] strChar=message.toCharArray();
+//
+//
+//
+//
+//		int[] x=new int[8];//定义临时补变量长度的数组
+//		String strx=null;
+//		LSBEncrypt.byteStr=new int[strChar.length*8];//重新清0
+//
+//		for(int i=0;i<strChar.length;i++){
+//			strx = Integer.toBinaryString(strChar[i]);
+//			if(strx.length()<8){//8位像素值补0
+//				int y=8-strx.length();
+//				for (int z=0;z<y;z++){
+//					x[z]=0;
+//				}
+//			}
+//			int h=0;
+//			for (int z=8-strx.length();z<8;z++){//补充值进去
+//				x[z]=getNumericValue((int)strx.charAt(h));
+//				h++;
+//			}
+//			System.arraycopy(x,0,LSBEncrypt.byteStr,i*8,8);
+//		}
+//
+//		String save_url = "src/main/resources/static/image/handleImg/output.bmp";
+//
+//
+//
+//
+//
+//	}
 }
