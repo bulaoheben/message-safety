@@ -223,7 +223,7 @@ public class LSBEncryptController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			map.put("url",save_url);
+			map.put("url","/image/handleImg/output.bmp");
 		}else if(LSBEncrypt.type==2){
 			handleService.implant_grey();
 			// 保存嵌入信息后的图像
