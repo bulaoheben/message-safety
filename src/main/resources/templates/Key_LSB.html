@@ -48,6 +48,7 @@
 			<div class="layui-panel"  style="float: right">
 				<button  type="button" class="layui-btn layui-btn-normal"   id="test1"><i class="layui-icon">&#xe67c;</i>读取图片</button>
 				<button type="button" class="layui-btn layui-btn-normal"  onclick="insertStr()">嵌入</button>
+				<button type="button" class="layui-btn layui-btn-normal"  onclick="insertStr()">提取</button>
 				<button type="button" class="layui-btn layui-btn-normal" onclick="downloadIamge()"><i class="layui-icon">&#xe601;</i>存储图片</button>
 <!--				<button type="button" class="layui-btn layui-btn-normal" onclick="extract()">提取</button>-->
 			</div>
@@ -75,9 +76,9 @@
 			<div class=" layui-col-md2" style="margin-right: 17px;    width: 19.666667%;">
 				<div class="layui-row" style="padding-top: 60px">
 					<fieldset class="layui-elem-field" style="border-color: #969696;">
-						<legend>可嵌入信息的最大长度</legend>
+						<legend>密钥</legend>
 						<div class="layui-field-box" style="display: flex;align-items: center;justify-content: center;" id="maxChar">
-
+							<textarea id="key" name="str" required lay-verify="required" placeholder="请输入" class="layui-textarea"></textarea>
 						</div>
 					</fieldset>
 				</div>
@@ -168,9 +169,7 @@
 
 							// 读取成功
 							if(data!=="设置失败" &&data!=="图片宽度不为4的倍数"&&data!=="图片大小超出要求（512*512）"&&data!=="图片格式不是BMP图"&&data!=="选取路径文件不存在！" ){
-								// 可嵌入信息的最大长度
-								var maxChar =  document.getElementById("maxChar");
-								maxChar.innerHTML= data
+
 
 
 
@@ -211,43 +210,89 @@
 		// 通过选择器获取img元素
 		var img = document.getElementById("demo1")
 		// 将图片的src属性作为URL地址
-		var url = window.sessionStorage.getItem("LSB_imageSrc")
+		var url = img.src
 
 		if(url) {
 
 			if (str !== "") {
+
+		// 输入密钥
+				var key2 = document.getElementById("key");
+				var key = key2.value;
+
+		// layer.prompt({
+		// 	formType: 0,
+		// 	value: '',
+		// 	title: '请输入密钥',
+		// 	btn: ['确定','取消'], //按钮，
+		// 	btnAlign: 'c'
+		// }, function(value,index){
+		// 	layer.close(index);
+		// 	if(value!==""){
+		// 		key = value
+		// 	}else {
+		// 		layer.msg("输入为空！", function () {
+		// 		});
+		// 	}
+		// 	console.log("key"+key)
+		//
+		//
+		//
+		//
+		//
+		// });
+
+
+
+				var adress = ""
+				adress = window.sessionStorage.getItem("LSB_imageSrc")
+
+				// $.ajax({
+				// 	url : "embedMessage",
+				// 	data : {url:adress,message,key},
+				// 	// dataType:'application/json',
+				// 	type : 'POST',
+				// 	success : function(data) {
+				// 		console.log(data)
+				//
+				// 		// 读取成功
+				// 		if(data!=="设置失败" &&data!=="图片宽度不为4的倍数"&&data!=="图片大小超出要求（512*512）"&&data!=="图片格式不是BMP图"&&data!=="选取路径文件不存在！" ){
+				//
+				//
+				//
+				//
+				// 		}else {
+				// 			// 显示提示
+				// 			layer.msg(data, function(){
+				// 			});
+				// 		}
+				//
+				// 	}
+				// });
+
 				$.ajax({
-					url: "embedMessage",
-					data: {str: str},
-					type: 'POST',
-					success: function (data) {
+					url : "embedMessage",
+					data : {url:adress,message:message,key:key},
+					type : 'POST',
+					success : function(data) {
 						console.log(data)
-						if (data.state) {
-							layer.msg(data.state, function () {
+
+						// 读取成功
+						if(data!=="设置失败" &&data!=="图片宽度不为4的倍数"&&data!=="图片大小超出要求（512*512）"&&data!=="图片格式不是BMP图"&&data!=="选取路径文件不存在！" ){
+
+
+
+
+						}else {
+							// 显示提示
+							layer.msg(data, function(){
 							});
-						} else if (data.url !== "") {
-							layer.msg("处理成功！", function () {
-							});
-
-							text.value = ""
-
-
-
-
-							var handleImg = document.getElementById("handleImg");
-							handleImg.style.display = "block"
-
-							$("#handleImg").attr("src", "");
-
-							var URL=data.url+"?s="+ (new Date()).getTime();
-							$("#handleImg").attr("src", URL);
-
-							// 	清空文本框
-
 						}
 
 					}
 				});
+
+
 
 			} else {
 				layer.msg("输入为空！", function () {});

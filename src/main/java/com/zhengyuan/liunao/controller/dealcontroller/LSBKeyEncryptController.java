@@ -23,10 +23,10 @@ public class LSBKeyEncryptController {
 
     @ResponseBody
     @RequestMapping(value = "/embedMessage")
-    public Map<String,String> embedMessage(@RequestBody Map<String,String> map) {
-        BufferedImage image = keyHandleService.readImage(map.get("url"));
-        String message=map.get("message");
-        String key = map.get("key");
+    public Map<String,String> embedMessage(String url,String message,String key) {
+        BufferedImage image = keyHandleService.readImage(url);
+        //String message=map.get("message");
+        //String key = map.get("key");
         // 在message的开头存入message的长度
         int length = message.length();
         String binary = String.format("%8s", Integer.toBinaryString(length)).replace(' ', '0');

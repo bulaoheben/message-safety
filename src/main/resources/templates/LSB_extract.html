@@ -163,17 +163,20 @@
 	function extract () {
 
 		// 获取图片url
-		var url = window.sessionStorage.getItem("LSB_imageSrc")
-		console.log("url:"+url)
 
 
+
+		// 通过选择器获取img元素
+		var img = document.getElementById("demo1")
+		// 将图片的src属性作为URL地址
+		var url = img.src
 
 
 		if(url !== ""){
 			$.ajax({
 				url : "extractInfo",
 				type : 'POST',
-				data:{url},
+				data:{url:window.sessionStorage.getItem("LSB_imageSrc")},
 				success : function(data) {
 					console.log(data)
 					if("true" in data) {
