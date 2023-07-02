@@ -48,6 +48,7 @@ public class LSBEncryptController {
 
 	@Autowired
 	HandleService handleService;
+	private int noise;
 
 	//	上传待嵌入的图片
 	@ResponseBody
@@ -158,6 +159,7 @@ public class LSBEncryptController {
 
 			return maxchar;
 		}catch (IOException e){
+			System.out.println("错误是"+e.toString());
 			return "选取路径文件不存在！";
 		}
 	}
@@ -223,14 +225,14 @@ public class LSBEncryptController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			map.put("url","/image/handleImg/output.bmp");
+			map.put("url",save_url);
 		}else if(LSBEncrypt.type==2){
 			handleService.implant_grey();
 			// 保存嵌入信息后的图像
 			ImageLoader imageLoader = new ImageLoader();
 			imageLoader.data = new ImageData[] { LSBEncrypt.new_imageData };
 			imageLoader.save(save_url, SWT.IMAGE_BMP);
-			map.put("url","/image/handleImg/output.bmp");
+			map.put("url",save_url);
 		}else{
 			map.put("state","图片格式类型不符合规定");
 		}
@@ -256,8 +258,8 @@ public class LSBEncryptController {
 	//提取嵌入信息
 	@ResponseBody
 	@RequestMapping(value = "/extractInfo")
-	public Map<String,String> extractInfo(){
-		Map<String,String> map = handleService.extract();
+	public Map<String,String> extractInfo(String url){
+		Map<String,String> map = handleService.extract(url);
 		Map<String,String> map_return = new HashMap<>();
 		if(map.containsKey("false")){
 			return map;
@@ -285,11 +287,11 @@ public class LSBEncryptController {
 	//保存图片
 	@ResponseBody
 	@RequestMapping(value = "/saveImage")
-	public Map<String,String> saveImage(String url2){
-		Map<String,String> map = new HashMap<>();
-
+	public String saveImage(String url2){
+		url2=url2+"\\image.bmp";
 			// 打开用于读取的URL连接
-			File oldpaths = new File("handleImg/output.bmp");
+			File oldpaths = new File("src/main/resources/static/image/handleImg/output.bmp");
+
 			File newpaths = new File(url2);
 			if (!newpaths.exists()) {
 				//Files.copy(oldpaths.toPath(), newpaths.toPath());
@@ -301,9 +303,7 @@ public class LSBEncryptController {
 				System.out.println("文件移动成功!（原文件存在)");
 			}
 			System.out.println("文件转移完成");
-			map.put("result","图片已保存成功");
-			return map;
-
+			return url2;
 	}
 
 
@@ -427,49 +427,4 @@ public class LSBEncryptController {
 		return "/image/handleImg/output.bmp";
 	}
 
-
-//	@ResponseBody
-//	@RequestMapping(value = "/randomEmbed")
-//	public String randomEmbed(String message,String key) {
-//		//限制密钥长度
-//		if(key.length()>8){
-//			return "密钥长度超出限制";
-//		}
-//		//限制嵌入信息长度
-//		if(message.length()>20){
-//			return "嵌入信息字符长度超出限制（20以内）";
-//		}
-//
-//		char[] strChar=message.toCharArray();
-//
-//
-//
-//
-//		int[] x=new int[8];//定义临时补变量长度的数组
-//		String strx=null;
-//		LSBEncrypt.byteStr=new int[strChar.length*8];//重新清0
-//
-//		for(int i=0;i<strChar.length;i++){
-//			strx = Integer.toBinaryString(strChar[i]);
-//			if(strx.length()<8){//8位像素值补0
-//				int y=8-strx.length();
-//				for (int z=0;z<y;z++){
-//					x[z]=0;
-//				}
-//			}
-//			int h=0;
-//			for (int z=8-strx.length();z<8;z++){//补充值进去
-//				x[z]=getNumericValue((int)strx.charAt(h));
-//				h++;
-//			}
-//			System.arraycopy(x,0,LSBEncrypt.byteStr,i*8,8);
-//		}
-//
-//		String save_url = "src/main/resources/static/image/handleImg/output.bmp";
-//
-//
-//
-//
-//
-//	}
 }

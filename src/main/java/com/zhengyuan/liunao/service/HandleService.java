@@ -96,12 +96,14 @@ public class HandleService {
 	}
 
 	// 提取嵌入信息
-	public Map<String,String> extract(){
+	public Map<String,String> extract(String url){
 		Map<String,String> map = new HashMap<>();
 		// 提取出的二进制信息,末尾是00000000结束
 		String byte_info = "";
 		try {
-			String url = "src/main/resources/static/image/handleImg/output.bmp";
+			if(url==null){
+				url = "src/main/resources/static/image/handleImg/output.bmp";
+			}
 			BufferedImage image = ImageIO.read(new File(url));
 			ImageData imageData = new ImageData(url);
 			byte[] header = new byte[54];
@@ -205,6 +207,34 @@ public class HandleService {
 			map.put("true",byte_info);
 		}
 		return map;
+	}
+
+
+	// 对灰度图进行随机间隔信息嵌入
+	public void implant_grey_random_interval(){
+		int[][] grey_implant = new int[LSBEncrypt.width][LSBEncrypt.height];
+		int count = 0;
+		for(int w=0;w<LSBEncrypt.width;w++){
+			for(int h=0;h<LSBEncrypt.height;h++){
+				count++;
+				if(count>LSBEncrypt.byteStr.length){
+					grey_implant[w][h] = LSBEncrypt.grey[w][h];
+				}else{
+					// 对最后一位写入的二进制嵌入信息值
+					if(LSBEncrypt.byteStr[count-1]==Integer.parseInt(LSBEncrypt.grey_byte[w][h].substring(7,8))){
+						grey_implant[w][h] = LSBEncrypt.grey[w][h];
+					}else {
+						if(LSBEncrypt.byteStr[count-1]==0){
+							grey_implant[w][h] = LSBEncrypt.grey[w][h]-1;
+						}else{
+							grey_implant[w][h] = LSBEncrypt.grey[w][h]+1;
+						}
+					}
+				}
+				LSBEncrypt.new_imageData.setPixel(w,h,grey_implant[w][h]);
+			}
+		}
+		LSBEncrypt.grey_implant = grey_implant;
 	}
 
 }
