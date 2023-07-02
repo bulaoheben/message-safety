@@ -155,7 +155,7 @@
 				if(res.code === 0){
 					// 	将路径存到ssesion
 					let src = res.data.src
-					window.sessionStorage.setItem("LSB_imageSrc",JSON.stringify(src))
+					window.sessionStorage.setItem("LSB_imageSrc",src)
 
 
 					// 	读取最大信息
@@ -178,9 +178,6 @@
 								// 显示提示
 								layer.msg(data, function(){
 								});
-
-
-
 							}
 
 						}
@@ -214,13 +211,13 @@
 		// 通过选择器获取img元素
 		var img = document.getElementById("demo1")
 		// 将图片的src属性作为URL地址
-		var url = img.src
+		var url = window.sessionStorage.getItem("LSB_imageSrc")
 
 		if(url) {
 
 			if (str !== "") {
 				$.ajax({
-					url: "encryptImage",
+					url: "embedMessage",
 					data: {str: str},
 					type: 'POST',
 					success: function (data) {

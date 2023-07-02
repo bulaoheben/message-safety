@@ -114,7 +114,8 @@
 			elem: '#test1' //绑定元素
 			// ,url: '/Sys/dealLogin' //上传接口
 			,url: '/Sys/image' //上传接口
-
+			,accept: 'file'
+			,ext: 'bmp'
 			,auto: true
 			,before: function(obj){
 				//预读本地文件示例
@@ -137,7 +138,7 @@
 				if(res.code === 0){
 					// 	将路径存到ssesion
 					let src = res.data.src
-					window.sessionStorage.setItem("LSB_imageSrc",JSON.stringify(src))
+					window.sessionStorage.setItem("LSB_imageSrc",src)
 
 
 				}
@@ -182,7 +183,7 @@
 						text.value = data.true
 
 					}else{
-						layer.msg("提取信息失败！", function(){});
+						layer.msg(data.false, function(){});
 					}
 
 				},
