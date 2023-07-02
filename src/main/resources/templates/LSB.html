@@ -43,13 +43,13 @@
 
 <div class="layui-card">
 
-	<div class="layui-card-header" style="font-size: 23px; line-height: 55px;height: 55px;">LSB数字隐藏算法
+	<div class="layui-card-header" style="font-size: 23px; line-height: 55px;height: 55px;"> <span> LSB数字隐藏算法(嵌入方法)</span>
 		<div class="layui-col-md6" style="float: right">
 			<div class="layui-panel"  style="float: right">
 				<button  type="button" class="layui-btn layui-btn-normal"   id="test1"><i class="layui-icon">&#xe67c;</i>读取图片</button>
 				<button type="button" class="layui-btn layui-btn-normal"  onclick="insertStr()">嵌入</button>
 				<button type="button" class="layui-btn layui-btn-normal" onclick="downloadIamge()"><i class="layui-icon">&#xe601;</i>存储图片</button>
-				<button type="button" class="layui-btn layui-btn-normal" onclick="extract()">提取</button>
+				<button type="button" class="layui-btn layui-btn-normal" onclick="extract()">切换到提取方法</button>
 			</div>
 		</div>
 	</div>
@@ -176,8 +176,7 @@
 
 							}else {
 								// 显示提示
-								layer.msg(data, function(){
-								});
+								layer.msg(data, function(){});
 
 
 
@@ -243,13 +242,24 @@
 							$("#handleImg").attr("src", "");
 
 							var URL=data.url+"?s="+ (new Date()).getTime();
+							// var URL=data.url;
 							$("#handleImg").attr("src", URL);
 
 							// 	清空文本框
 
 						}
 
-					}
+					},
+
+					// Ajax接口出现错误时执行下述代码
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+
+						layer.msg("服务异常：请检查嵌入信息是否为中文字符", function(){});
+						console.log(XMLHttpRequest.status);
+						console.log(XMLHttpRequest.readyState);
+						console.log(textStatus);
+					},
+
 				});
 
 			} else {
@@ -325,7 +335,16 @@
 						layer.msg("提取信息失败！", function(){});
 					}
 
-				}
+				},
+
+				// Ajax接口出现错误时执行下述代码
+				error: function(XMLHttpRequest, textStatus, errorThrown) {
+
+					layer.msg("服务异常!", function () {});
+					console.log(XMLHttpRequest.status);
+					console.log(XMLHttpRequest.readyState);
+					console.log(textStatus);
+				},
 			});
 
 		}else {
