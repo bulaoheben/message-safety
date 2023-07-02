@@ -224,14 +224,14 @@ public class LSBEncryptController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			map.put("url","/image/handleImg/output.bmp");
+			map.put("url",save_url);
 		}else if(LSBEncrypt.type==2){
 			handleService.implant_grey();
 			// 保存嵌入信息后的图像
 			ImageLoader imageLoader = new ImageLoader();
 			imageLoader.data = new ImageData[] { LSBEncrypt.new_imageData };
 			imageLoader.save(save_url, SWT.IMAGE_BMP);
-			map.put("url","/image/handleImg/output.bmp");
+			map.put("url",save_url);
 		}else{
 			map.put("state","图片格式类型不符合规定");
 		}
