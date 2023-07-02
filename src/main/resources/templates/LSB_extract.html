@@ -46,6 +46,8 @@
 	<div class="layui-card-header" style="font-size: 23px; line-height: 55px;height: 55px;"> <span> LSB数字隐藏算法(提取方法)</span>
 		<div class="layui-col-md6" style="float: right">
 			<div class="layui-panel"  style="float: right">
+<!--				<input   class="layui-btn layui-btn-normal" accept=".bmp" type="file"  id ="imgFile">-->
+
 				<button  type="button" class="layui-btn layui-btn-normal"   id="test1"><i class="layui-icon">&#xe67c;</i>读取图片</button>
 				<button type="button" class="layui-btn layui-btn-normal"  onclick="extract()">提取</button>
 				<a href="LSB_embed"><button type="button" class="layui-btn layui-btn-normal" >切换到嵌入方法</button></a>
@@ -79,7 +81,7 @@
 <!--						<legend id="message" >要嵌入的信息/提取出的信息</legend>-->
 
 						<div class="layui-field-box"  show="true"  >
-							<textarea id="text" name="str" style="height: 300px;"   required lay-verify="required" placeholder="请输入" class="layui-textarea"></textarea>
+							<textarea id="text" name="str" style="height: 300px;"   required lay-verify="required"  class="layui-textarea"></textarea>
 						</div>
 <!--						<div show="false" class="layui-field-box" style="display: flex;align-items: center;justify-content: center;" id="extractMsg">-->
 
@@ -130,10 +132,6 @@
 
 				});
 
-				// 清空之前的处理图片,并隐藏
-				// $("#handleImg").attr("src","");
-				var handleImg =  document.getElementById("handleImg");
-				handleImg.style.display="none"
 
 
 				if(res.code === 0){
@@ -142,32 +140,6 @@
 					window.sessionStorage.setItem("LSB_imageSrc",JSON.stringify(src))
 
 
-					// 	读取最大信息
-					$.ajax({
-						url : "upImageUrl",
-						data : {url:src},
-						type : 'POST',
-						success : function(data) {
-							console.log(data)
-
-							// 读取成功
-							if(data!=="设置失败" &&data!=="图片宽度不为4的倍数"&&data!=="图片大小超出要求（512*512）"&&data!=="图片格式不是BMP图"&&data!=="选取路径文件不存在！" ){
-								// 可嵌入信息的最大长度
-								var maxChar =  document.getElementById("maxChar");
-								maxChar.innerHTML= data
-
-
-
-							}else {
-								// 显示提示
-								layer.msg(data, function(){});
-
-
-
-							}
-
-						}
-					});
 				}
 
 
@@ -182,75 +154,25 @@
 	});
 
 
-	/*选择文件路径方法*/
 
-	// panel.webview.onDidReceiveMessage(async(message)=>{
-	// 	if(message.selectFolder==="selectFolder"){
-	// 		let msg = await util.selectFolder()
-	// 		panel.webview.postMessage({
-	// 			message:msg
-	// 		})
-	// 	}
-	// })
-	//
-	// window.addEventListener("message", function( event ) {
-	// 	//文件夹目录
-	// 	if(event.data.selectFolder){
-	// 		vscode.postMessage({
-	// 			selectFolder:event.data.selectFolder
-	// 		})
-	// 	}
-	// 	if(event.data.message){
-	// 		//选择的文件夹
-	// 		document.getElementById("iframeMsg").contentWindow
-	// 				.postMessage({message:event.data.message}, '*');
-	// 	}
-	// });
-	//
-	// const vscode = require('vscode');
-	// /**
-	//  * 选择本地目录/文件夹
-	//  */
-	// function selectFolder(){
-	// 	const options = {
-	// 		canSelectMany: false,//是否可以选择多个
-	// 		openLabel: '选择文件夹',//打开选择的右下角按钮label
-	// 		canSelectFiles: false,//是否选择文件
-	// 		canSelectFolders: true,//是否选择文件夹
-	// 		defaultUri:vscode.Uri.file('')//默认打开但本地路径
-	// 	};
-	//
-	// 	return vscode.window.showOpenDialog(options).then(fileUri => {
-	// 		if (fileUri && fileUri[0]) {
-	// 			console.log('Selected file: ' + fileUri[0].fsPath);
-	// 			return fileUri[0].fsPath
-	// 		}
-	// 	});
-	// }
-
-	 function selectFolder() {
-		window.parent.postMessage({selectFolder:"selectFolder"},"*")
-	}
 
 
 
 	/*提取信息*/
 	function extract () {
 
+		// 获取图片url
+		var url = window.sessionStorage.getItem("LSB_imageSrc")
+		console.log("url:"+url)
 
-		// 通过选择器获取img元素
-		var img = document.getElementById("handleImg")
-		// 将图片的src属性作为URL地址
-		var url = img.src
-		console.log(url);
 
-		var message = document.getElementById("message");
-		message.innerText = "提取出的信息"
+
 
 		if(url !== ""){
 			$.ajax({
 				url : "extractInfo",
 				type : 'POST',
+				data:{url},
 				success : function(data) {
 					console.log(data)
 					if("true" in data) {
