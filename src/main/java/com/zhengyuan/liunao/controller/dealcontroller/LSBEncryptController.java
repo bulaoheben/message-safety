@@ -230,7 +230,7 @@ public class LSBEncryptController {
 			ImageLoader imageLoader = new ImageLoader();
 			imageLoader.data = new ImageData[] { LSBEncrypt.new_imageData };
 			imageLoader.save(save_url, SWT.IMAGE_BMP);
-			map.put("url",save_url);
+			map.put("url","/image/handleImg/output.bmp");
 		}else{
 			map.put("state","图片格式类型不符合规定");
 		}
