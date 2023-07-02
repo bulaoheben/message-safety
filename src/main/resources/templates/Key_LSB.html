@@ -48,8 +48,8 @@
 			<div class="layui-panel"  style="float: right">
 				<button  type="button" class="layui-btn layui-btn-normal"   id="test1"><i class="layui-icon">&#xe67c;</i>读取图片</button>
 				<button type="button" class="layui-btn layui-btn-normal"  onclick="insertStr()">嵌入</button>
-				<button type="button" class="layui-btn layui-btn-normal"  onclick="insertStr()">提取</button>
-				<button type="button" class="layui-btn layui-btn-normal" onclick="downloadIamge()"><i class="layui-icon">&#xe601;</i>存储图片</button>
+				<button type="button" class="layui-btn layui-btn-normal"  onclick="extract()">提取</button>
+<!--				<button type="button" class="layui-btn layui-btn-normal" onclick="downloadIamge()"><i class="layui-icon">&#xe601;</i>存储图片</button>-->
 <!--				<button type="button" class="layui-btn layui-btn-normal" onclick="extract()">提取</button>-->
 			</div>
 		</div>
@@ -198,13 +198,11 @@
 	function insertStr () {
 
 		var text = document.getElementById("text");
-		var str = text.value;
+		var message = text.value;
 		// var str = $("#text").text()
-		console.log("str:"+str);
+		console.log("str:"+message);
 
 
-		var message = document.getElementById("message");
-		message.innerText = "要嵌入的信息"
 
 
 		// 通过选择器获取img元素
@@ -214,78 +212,50 @@
 
 		if(url) {
 
-			if (str !== "") {
+			if (message !== "") {
 
 		// 输入密钥
 				var key2 = document.getElementById("key");
 				var key = key2.value;
-
-		// layer.prompt({
-		// 	formType: 0,
-		// 	value: '',
-		// 	title: '请输入密钥',
-		// 	btn: ['确定','取消'], //按钮，
-		// 	btnAlign: 'c'
-		// }, function(value,index){
-		// 	layer.close(index);
-		// 	if(value!==""){
-		// 		key = value
-		// 	}else {
-		// 		layer.msg("输入为空！", function () {
-		// 		});
-		// 	}
-		// 	console.log("key"+key)
-		//
-		//
-		//
-		//
-		//
-		// });
 
 
 
 				var adress = ""
 				adress = window.sessionStorage.getItem("LSB_imageSrc")
 
-				// $.ajax({
-				// 	url : "embedMessage",
-				// 	data : {url:adress,message,key},
-				// 	// dataType:'application/json',
-				// 	type : 'POST',
-				// 	success : function(data) {
-				// 		console.log(data)
-				//
-				// 		// 读取成功
-				// 		if(data!=="设置失败" &&data!=="图片宽度不为4的倍数"&&data!=="图片大小超出要求（512*512）"&&data!=="图片格式不是BMP图"&&data!=="选取路径文件不存在！" ){
-				//
-				//
-				//
-				//
-				// 		}else {
-				// 			// 显示提示
-				// 			layer.msg(data, function(){
-				// 			});
-				// 		}
-				//
-				// 	}
-				// });
+
+				var formData = new FormData();
+				formData.append("url",adress);
+				formData.append("message",message);
+				formData.append("key",key);
+				console.log(key +""+adress )
 
 				$.ajax({
 					url : "embedMessage",
 					data : {url:adress,message:message,key:key},
+					// data : formData,
 					type : 'POST',
 					success : function(data) {
 						console.log(data)
+						// 清空
+						text.value =""
 
 						// 读取成功
-						if(data!=="设置失败" &&data!=="图片宽度不为4的倍数"&&data!=="图片大小超出要求（512*512）"&&data!=="图片格式不是BMP图"&&data!=="选取路径文件不存在！" ){
+						if("true" in data) {
+							layer.msg("处理成功！", function(){});
 
+							var handleImg = document.getElementById("handleImg");
+							handleImg.style.display = "block"
 
+							$("#handleImg").attr("src", "");
 
+							var URL="/image/handleImg/output.bmp"+"?s="+ (new Date()).getTime();
+							// var URL=data.url;
+							$("#handleImg").attr("src", URL);
 
 						}else {
 							// 显示提示
-							layer.msg(data, function(){
+							layer.msg(data.false, function(){
 							});
 						}
 
@@ -303,39 +273,6 @@
 
 	}
 
-	/*存储图片*/
-	function downloadIamge() {
-		//alert(ReadFlag);
-		// if(ReadFlag === undefined){
-		// 	layer.msg("嵌入信息后的图片未存在！", {time: 1000},function(){});//取消抖动
-		// 	// layer.msg("嵌入信息后的图片未存在！",  { shift: -1 },function(){});//取消抖动
-		//
-		// 	return;
-		// }
-
-
-
-		// 通过选择器获取img元素
-		var img = document.getElementById("handleImg")
-		// 将图片的src属性作为URL地址
-		var url = img.src
-		if(url === ""){
-			layer.msg("嵌入信息后的图片未存在！", {time: 1000},function(){});//取消抖动
-			// layer.msg("嵌入信息后的图片未存在！",  { shift: -1 },function(){});//取消抖动
-
-			return;
-		}
-		layer.msg("正在下载，请稍后", {time: 3000},function(){});//取消抖动
-			var a = document.createElement('a')
-			var event = new MouseEvent('click')
-			a.download = "handleImg.bmp" // '下载图片名称'
-			a.href = url
-			a.dispatchEvent(event)
-
-
-
-
-	}
 
 
 	/*提取信息*/
@@ -350,25 +287,33 @@
 
 		var message = document.getElementById("message");
 		message.innerText = "提取出的信息"
+		var key2 = document.getElementById("key");
+		var key = key2.value;
 
 		if(url !== ""){
+			if(key!==""){
 			$.ajax({
-				url : "extractInfo",
+				url : "extractMessage",
 				type : 'POST',
+				data:{key:key},
 				success : function(data) {
 					console.log(data)
-					if("true" in data) {
-						layer.msg("提取信息成功！", function(){});
+
+						layer.msg(data, function(){});
 
 						var text = document.getElementById("text");
-						text.value = data.true
+						text.value = data
 
-					}else{
-						layer.msg("提取信息失败！", function(){});
-					}
+
+						// layer.msg("提取信息失败！", function(){});
+
 
 				}
 			});
+
+		}else {
+				layer.msg("请输入密钥！", function(){});
+			}
 
 		}else {
 			layer.msg("嵌入信息后的图片未存在！", function(){});
