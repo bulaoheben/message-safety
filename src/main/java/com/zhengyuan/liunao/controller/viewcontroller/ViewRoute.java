@@ -4,7 +4,6 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
@@ -12,9 +11,9 @@ import org.springframework.web.servlet.ModelAndView;
 public class ViewRoute {
 
 	/*登录相关*/
-	@RequestMapping("/LSB")
+	@RequestMapping("/LSB_embed")
 	public ModelAndView loginView(HttpSession httpSession) {
-		ModelAndView mv = new ModelAndView("LSB");
+		ModelAndView mv = new ModelAndView("LSB_embed");
 
 		mv.addObject("outputImg","");
 		return mv;
@@ -31,6 +30,12 @@ public class ViewRoute {
 	public String Key_LSB(HttpSession httpSession) {
 
 		return "Key_LSB";
+	}
+
+	@RequestMapping("/LSB_extract")
+	public String LSB_extract(HttpSession httpSession) {
+
+		return "LSB_extract";
 	}
 
 	

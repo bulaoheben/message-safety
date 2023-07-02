@@ -43,12 +43,13 @@
 
 <div class="layui-card">
 
-	<div class="layui-card-header" style="font-size: 23px; line-height: 55px;height: 55px;">图像噪声添加
+	<div class="layui-card-header" style="font-size: 23px; line-height: 55px;height: 55px;"> <span> LSB数字隐藏算法(嵌入方法)</span>
 		<div class="layui-col-md6" style="float: right">
 			<div class="layui-panel"  style="float: right">
 				<button  type="button" class="layui-btn layui-btn-normal"   id="test1"><i class="layui-icon">&#xe67c;</i>读取图片</button>
-				<button type="button" class="layui-btn layui-btn-normal"  onclick="Noise()">添加噪声</button>
-				<button type="button" class="layui-btn layui-btn-normal" onclick="downloadIamge()"><i class="layui-icon">&#xe601;</i>存储图片</button>
+				<button type="button" class="layui-btn layui-btn-normal"  onclick="insertStr()">嵌入</button>
+				<button type="button" class="layui-btn layui-btn-normal" style="margin-left: 0;" onclick="downloadIamge()"><i class="layui-icon">&#xe601;</i>存储图片</button>
+				<a href="LSB_extract"><button type="button" class="layui-btn layui-btn-normal" >切换到提取方法</button></a>
 			</div>
 		</div>
 	</div>
@@ -65,7 +66,6 @@
 				<img id="demo1"
 					 width="512"
 					 height="512"
-					 object-fit="contain"
 
 				/>
 				</fieldset>
@@ -73,10 +73,30 @@
 			</div>
 
 			<div class=" layui-col-md2" style="margin-right: 17px;    width: 19.666667%;">
+				<div class="layui-row" style="padding-top: 60px">
+					<fieldset class="layui-elem-field" style="border-color: #969696;">
+						<legend>可嵌入信息的最大长度</legend>
+						<div class="layui-field-box" style="display: flex;align-items: center;justify-content: center;" id="maxChar">
 
+						</div>
+					</fieldset>
+				</div>
+				<div class="layui-row" style="  padding-top: 103px;">
+					<fieldset class="layui-elem-field" style="border-color: #969696;">
+						<legend id="message" >要嵌入的信息</legend>
+<!--						<legend id="message" >要嵌入的信息/提取出的信息</legend>-->
+
+						<div class="layui-field-box"  show="true">
+							<textarea id="text" name="str" required lay-verify="required" placeholder="请输入" class="layui-textarea"></textarea>
+						</div>
+<!--						<div show="false" class="layui-field-box" style="display: flex;align-items: center;justify-content: center;" id="extractMsg">-->
+
+<!--						</div>-->
+					</fieldset>
+				</div>
 			</div>
 			<div class="layui-col-md5"style="width: 512px;">
-				<text style="font-size: 20px;font-weight: 300;padding-bottom: 4px;display: flex;justify-content: center;width: 512px">添加噪声后的图</text>
+				<text style="font-size: 20px;font-weight: 300;padding-bottom: 4px;display: flex;justify-content: center;width: 512px">嵌入信息后的图</text>
 				<fieldset class="layui-elem-field" style="border-color: #969696;width: 512px;height: 512px">
 				<div  id="imgContain"></div>
 					<img id="handleImg" width="512" height="512" >
@@ -156,8 +176,7 @@
 
 							}else {
 								// 显示提示
-								layer.msg(data, function(){
-								});
+								layer.msg(data, function(){});
 
 
 
@@ -178,8 +197,18 @@
 		});
 	});
 
-	/*添加噪声*/
-	function Noise () {
+	/*嵌入信息*/
+	function insertStr () {
+
+		var text = document.getElementById("text");
+		var str = text.value;
+		// var str = $("#text").text()
+		console.log("str:"+str);
+
+
+		var message = document.getElementById("message");
+		message.innerText = "要嵌入的信息"
+
 
 		// 通过选择器获取img元素
 		var img = document.getElementById("demo1")
@@ -187,31 +216,57 @@
 		var url = img.src
 
 		if(url) {
-			$.ajax({
-				url : "addnoise",
-				type : 'POST',
-				success : function(data) {
-					console.log(data)
-					 if(data) {
-						layer.msg("处理成功！", function(){});
+
+			if (str !== "") {
+				$.ajax({
+					url: "encryptImage",
+					data: {str: str},
+					type: 'POST',
+					success: function (data) {
+						console.log(data)
+						if (data.state) {
+							layer.msg(data.state, function () {
+							});
+						} else if (data.url !== "") {
+							layer.msg("处理成功！", function () {
+							});
+
+							text.value = ""
 
 
-						var handleImg =  document.getElementById("handleImg");
-						handleImg.style.display="block"
-
-						$("#handleImg").attr("src","");
-						 var URL=data+"?s="+ (new Date()).getTime();
-
-						$("#handleImg").attr("src",URL);
 
 
-					}
+							var handleImg = document.getElementById("handleImg");
+							handleImg.style.display = "block"
 
-				}
-			});
+							$("#handleImg").attr("src", "");
 
+							var URL=data.url+"?s="+ (new Date()).getTime();
+							// var URL=data.url;
+							$("#handleImg").attr("src", URL);
+
+							// 	清空文本框
+
+						}
+
+					},
+
+					// Ajax接口出现错误时执行下述代码
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+
+						layer.msg("服务异常：请检查嵌入信息是否为中文字符", function(){});
+						console.log(XMLHttpRequest.status);
+						console.log(XMLHttpRequest.readyState);
+						console.log(textStatus);
+					},
+
+				});
+
+			} else {
+				layer.msg("输入为空！", function () {});
+			}
 		}else {
-			layer.msg("未读取图片！", function(){});
+			layer.msg("未读取图片！", function () {});
 		}
 
 	}
@@ -251,7 +306,52 @@
 	}
 
 
+	/*提取信息*/
+	function extract () {
 
+
+		// 通过选择器获取img元素
+		var img = document.getElementById("handleImg")
+		// 将图片的src属性作为URL地址
+		var url = img.src
+		console.log(url);
+
+		var message = document.getElementById("message");
+		message.innerText = "提取出的信息"
+
+		if(url !== ""){
+			$.ajax({
+				url : "extractInfo",
+				type : 'POST',
+				success : function(data) {
+					console.log(data)
+					if("true" in data) {
+						layer.msg("提取信息成功！", function(){});
+
+						var text = document.getElementById("text");
+						text.value = data.true
+
+					}else{
+						layer.msg("提取信息失败！", function(){});
+					}
+
+				},
+
+				// Ajax接口出现错误时执行下述代码
+				error: function(XMLHttpRequest, textStatus, errorThrown) {
+
+					layer.msg("服务异常!", function () {});
+					console.log(XMLHttpRequest.status);
+					console.log(XMLHttpRequest.readyState);
+					console.log(textStatus);
+				},
+			});
+
+		}else {
+			layer.msg("嵌入信息后的图片未存在！", function(){});
+		}
+
+	}
 
 
 </script>
@@ -268,6 +368,7 @@
 		display: flex;
 		justify-content: center;
 	}
+
 	img{
 		object-fit: contain;
 	}

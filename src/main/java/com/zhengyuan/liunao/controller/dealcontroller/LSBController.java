@@ -18,15 +18,6 @@ import java.util.Map;
 @RequestMapping("/Sys")
 public class LSBController {
 
-//    @RequestMapping(value = "/upload")
-//    @ResponseBody
-//    public String registerCompanyDeal(MultipartFile file) {
-//        System.out.println("上传图片："+file);
-//
-//
-//
-//        return "成功";
-//    }
 
 
         @RequestMapping("/image")
@@ -57,6 +48,7 @@ public class LSBController {
 //            }
             return dataJson;
         }
+
     }
 
 

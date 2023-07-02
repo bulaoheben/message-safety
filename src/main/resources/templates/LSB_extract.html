@@ -31,7 +31,7 @@
 	<li class="layui-nav-item">
 		<a href="javascript:;">菜单</a>
 		<dl class="layui-nav-child"> <!-- 二级菜单 -->
-			<dd><a href="LSB">LSB信息隐藏</a></dd>
+			<dd><a href="LSB_embed">LSB信息隐藏</a></dd>
 			<dd><a href="addNoise">图像噪声添加</a></dd>
 			<dd><a href="Key_LSB">带密钥的随机间隔LSB</a></dd>
 		</dl>
@@ -43,13 +43,12 @@
 
 <div class="layui-card">
 
-	<div class="layui-card-header" style="font-size: 23px; line-height: 55px;height: 55px;"> <span> LSB数字隐藏算法(嵌入方法)</span>
+	<div class="layui-card-header" style="font-size: 23px; line-height: 55px;height: 55px;"> <span> LSB数字隐藏算法(提取方法)</span>
 		<div class="layui-col-md6" style="float: right">
 			<div class="layui-panel"  style="float: right">
 				<button  type="button" class="layui-btn layui-btn-normal"   id="test1"><i class="layui-icon">&#xe67c;</i>读取图片</button>
-				<button type="button" class="layui-btn layui-btn-normal"  onclick="insertStr()">嵌入</button>
-				<button type="button" class="layui-btn layui-btn-normal" onclick="downloadIamge()"><i class="layui-icon">&#xe601;</i>存储图片</button>
-				<button type="button" class="layui-btn layui-btn-normal" onclick="extract()">切换到提取方法</button>
+				<button type="button" class="layui-btn layui-btn-normal"  onclick="extract()">提取</button>
+				<a href="LSB_embed"><button type="button" class="layui-btn layui-btn-normal" >切换到嵌入方法</button></a>
 			</div>
 		</div>
 	</div>
@@ -60,7 +59,7 @@
 <!--	分成均匀3部分	-->
 		<div class="layui-row layui-col-space10">
 			<div class="layui-col-md5" style=" width: 38%;  margin-left: 32px;" >
-				<text style="font-size: 20px;font-weight: 300;padding-bottom: 4px;display: flex;justify-content: center;width: 512px">原图</text>
+				<text style="font-size: 20px;font-weight: 300;padding-bottom: 4px;display: flex;justify-content: center;width: 512px">待提取信息的图片</text>
 				<fieldset class="layui-elem-field" style="border-color: #969696;width: 512px;height: 512px">
 
 				<img id="demo1"
@@ -72,22 +71,15 @@
 
 			</div>
 
-			<div class=" layui-col-md2" style="margin-right: 17px;    width: 19.666667%;">
-				<div class="layui-row" style="padding-top: 60px">
-					<fieldset class="layui-elem-field" style="border-color: #969696;">
-						<legend>可嵌入信息的最大长度</legend>
-						<div class="layui-field-box" style="display: flex;align-items: center;justify-content: center;" id="maxChar">
+			<div class=" layui-col-md7" style="margin-right: 17px;  ">
 
-						</div>
-					</fieldset>
-				</div>
 				<div class="layui-row" style="  padding-top: 103px;">
 					<fieldset class="layui-elem-field" style="border-color: #969696;">
-						<legend id="message" >要嵌入的信息</legend>
+						<legend id="message" >提取出的信息</legend>
 <!--						<legend id="message" >要嵌入的信息/提取出的信息</legend>-->
 
-						<div class="layui-field-box"  show="true">
-							<textarea id="text" name="str" required lay-verify="required" placeholder="请输入" class="layui-textarea"></textarea>
+						<div class="layui-field-box"  show="true"  >
+							<textarea id="text" name="str" style="height: 300px;"   required lay-verify="required" placeholder="请输入" class="layui-textarea"></textarea>
 						</div>
 <!--						<div show="false" class="layui-field-box" style="display: flex;align-items: center;justify-content: center;" id="extractMsg">-->
 
@@ -95,15 +87,7 @@
 					</fieldset>
 				</div>
 			</div>
-			<div class="layui-col-md5"style="width: 512px;">
-				<text style="font-size: 20px;font-weight: 300;padding-bottom: 4px;display: flex;justify-content: center;width: 512px">嵌入信息后的图</text>
-				<fieldset class="layui-elem-field" style="border-color: #969696;width: 512px;height: 512px">
-				<div  id="imgContain"></div>
-					<img id="handleImg" width="512" height="512" >
 
-				</fieldset>
-
-			</div>
 
 	</div>
 </div>
@@ -197,113 +181,57 @@
 		});
 	});
 
-	/*嵌入信息*/
-	function insertStr () {
 
-		var text = document.getElementById("text");
-		var str = text.value;
-		// var str = $("#text").text()
-		console.log("str:"+str);
+	/*选择文件路径方法*/
 
+	// panel.webview.onDidReceiveMessage(async(message)=>{
+	// 	if(message.selectFolder==="selectFolder"){
+	// 		let msg = await util.selectFolder()
+	// 		panel.webview.postMessage({
+	// 			message:msg
+	// 		})
+	// 	}
+	// })
+	//
+	// window.addEventListener("message", function( event ) {
+	// 	//文件夹目录
+	// 	if(event.data.selectFolder){
+	// 		vscode.postMessage({
+	// 			selectFolder:event.data.selectFolder
+	// 		})
+	// 	}
+	// 	if(event.data.message){
+	// 		//选择的文件夹
+	// 		document.getElementById("iframeMsg").contentWindow
+	// 				.postMessage({message:event.data.message}, '*');
+	// 	}
+	// });
+	//
+	// const vscode = require('vscode');
+	// /**
+	//  * 选择本地目录/文件夹
+	//  */
+	// function selectFolder(){
+	// 	const options = {
+	// 		canSelectMany: false,//是否可以选择多个
+	// 		openLabel: '选择文件夹',//打开选择的右下角按钮label
+	// 		canSelectFiles: false,//是否选择文件
+	// 		canSelectFolders: true,//是否选择文件夹
+	// 		defaultUri:vscode.Uri.file('')//默认打开但本地路径
+	// 	};
+	//
+	// 	return vscode.window.showOpenDialog(options).then(fileUri => {
+	// 		if (fileUri && fileUri[0]) {
+	// 			console.log('Selected file: ' + fileUri[0].fsPath);
+	// 			return fileUri[0].fsPath
+	// 		}
+	// 	});
+	// }
 
-		var message = document.getElementById("message");
-		message.innerText = "要嵌入的信息"
-
-
-		// 通过选择器获取img元素
-		var img = document.getElementById("demo1")
-		// 将图片的src属性作为URL地址
-		var url = img.src
-
-		if(url) {
-
-			if (str !== "") {
-				$.ajax({
-					url: "encryptImage",
-					data: {str: str},
-					type: 'POST',
-					success: function (data) {
-						console.log(data)
-						if (data.state) {
-							layer.msg(data.state, function () {
-							});
-						} else if (data.url !== "") {
-							layer.msg("处理成功！", function () {
-							});
-
-							text.value = ""
-
-
-
-
-							var handleImg = document.getElementById("handleImg");
-							handleImg.style.display = "block"
-
-							$("#handleImg").attr("src", "");
-
-							var URL=data.url+"?s="+ (new Date()).getTime();
-							// var URL=data.url;
-							$("#handleImg").attr("src", URL);
-
-							// 	清空文本框
-
-						}
-
-					},
-
-					// Ajax接口出现错误时执行下述代码
-					error: function(XMLHttpRequest, textStatus, errorThrown) {
-
-						layer.msg("服务异常：请检查嵌入信息是否为中文字符", function(){});
-						console.log(XMLHttpRequest.status);
-						console.log(XMLHttpRequest.readyState);
-						console.log(textStatus);
-					},
-
-				});
-
-			} else {
-				layer.msg("输入为空！", function () {});
-			}
-		}else {
-			layer.msg("未读取图片！", function () {});
-		}
-
+	 function selectFolder() {
+		window.parent.postMessage({selectFolder:"selectFolder"},"*")
 	}
 
-	/*存储图片*/
-	function downloadIamge() {
-		//alert(ReadFlag);
-		// if(ReadFlag === undefined){
-		// 	layer.msg("嵌入信息后的图片未存在！", {time: 1000},function(){});//取消抖动
-		// 	// layer.msg("嵌入信息后的图片未存在！",  { shift: -1 },function(){});//取消抖动
-		//
-		// 	return;
-		// }
-
-
-
-		// 通过选择器获取img元素
-		var img = document.getElementById("handleImg")
-		// 将图片的src属性作为URL地址
-		var url = img.src
-		if(url === ""){
-			layer.msg("嵌入信息后的图片未存在！", {time: 1000},function(){});//取消抖动
-			// layer.msg("嵌入信息后的图片未存在！",  { shift: -1 },function(){});//取消抖动
-
-			return;
-		}
-		layer.msg("正在下载，请稍后", {time: 3000},function(){});//取消抖动
-			var a = document.createElement('a')
-			var event = new MouseEvent('click')
-			a.download = "handleImg.bmp" // '下载图片名称'
-			a.href = url
-			a.dispatchEvent(event)
-
-
-
-
-	}
 
 
 	/*提取信息*/
