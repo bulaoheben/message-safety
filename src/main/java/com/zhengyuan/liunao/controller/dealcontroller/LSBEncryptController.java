@@ -158,6 +158,7 @@ public class LSBEncryptController {
 
 			return maxchar;
 		}catch (IOException e){
+			System.out.println("错误是"+e.toString());
 			return "选取路径文件不存在！";
 		}
 	}
@@ -256,8 +257,8 @@ public class LSBEncryptController {
 	//提取嵌入信息
 	@ResponseBody
 	@RequestMapping(value = "/extractInfo")
-	public Map<String,String> extractInfo(){
-		Map<String,String> map = handleService.extract();
+	public Map<String,String> extractInfo(String url){
+		Map<String,String> map = handleService.extract(url);
 		Map<String,String> map_return = new HashMap<>();
 		if(map.containsKey("false")){
 			return map;
