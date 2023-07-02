@@ -176,8 +176,7 @@
 
 							}else {
 								// 显示提示
-								layer.msg(data, function(){
-								});
+								layer.msg(data, function(){});
 
 
 
@@ -250,7 +249,17 @@
 
 						}
 
-					}
+					},
+
+					// Ajax接口出现错误时执行下述代码
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+
+						layer.msg("服务异常：请检查嵌入信息是否为中文字符", function(){});
+						console.log(XMLHttpRequest.status);
+						console.log(XMLHttpRequest.readyState);
+						console.log(textStatus);
+					},
+
 				});
 
 			} else {
@@ -326,7 +335,16 @@
 						layer.msg("提取信息失败！", function(){});
 					}
 
-				}
+				},
+
+				// Ajax接口出现错误时执行下述代码
+				error: function(XMLHttpRequest, textStatus, errorThrown) {
+
+					layer.msg("服务异常!", function () {});
+					console.log(XMLHttpRequest.status);
+					console.log(XMLHttpRequest.readyState);
+					console.log(textStatus);
+				},
 			});
 
 		}else {
